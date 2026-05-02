@@ -27,3 +27,6 @@ logs/*
 !outputs/figures/.gitkeep
 !logs/.gitkeep
 .omx/
+
+# Local raw archive drops
+data.zip
