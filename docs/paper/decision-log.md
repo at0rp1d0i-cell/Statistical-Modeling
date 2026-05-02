@@ -94,8 +94,28 @@
 - 不能直接上升为论文 headline 异质性结论
 - 是否将当前特征集作为正式异质性解释变量，仍属于研究设计决定
 
+## 2026-05-02 新增执行状态
+
+### 7. 政策文本 seed 机制候选回归已跑通
+
+- 已将首批中央政策 seed 的规则代理分数合并为 city-year 机制候选变量
+- 已完成候选机制 OLS 技术入口，并导出：
+  - `outputs/tables/table_05_policy_seed_mechanism_candidate.csv`
+  - `outputs/tables/table_05_policy_seed_mechanism_candidate.tex`
+- 当前候选机制变量结果：
+  - `sum_policy_strength_city_year`: 系数 `10.4758`，95% CI = `[5.0697, 15.8819]`，p-value = `0.0001`
+  - `mean_execution_clarity_city_year`: 系数 `26.1894`，95% CI = `[12.6742, 39.7047]`，p-value = `0.0001`
+  - `mean_digital_green_synergy_city_year`: 系数 `26.1894`，95% CI = `[12.6742, 39.7047]`，p-value = `0.0001`
+
+说明：
+
+- 该结果只证明政策文本机制变量的“登记—评分—聚合—并表—回归”技术链路已打通
+- 由于当前仍是 seed 中央文档和 rule-proxy 分数，该结果不能作为最终论文机制结论
+- 是否扩展到完整中央—省级—地级市政策语料，以及是否采用 validated LLM scoring，仍属于后续研究设计与执行任务
+
 ## 对写作的直接影响
 
 1. 摘要中可以直接写“已形成 2019—2023 年城市级 DML 候选样本”
 2. 但不能把人口变量写成最终锁定控制口径
 3. 也不能把当前样本写成最终不可变样本，只能写成“当前主规格候选样本”
+4. 政策文本机制目前只能写成 seed 技术候选证据，不能写成最终机制发现
