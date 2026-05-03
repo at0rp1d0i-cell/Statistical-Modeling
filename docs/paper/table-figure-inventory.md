@@ -8,6 +8,7 @@
 | --- | --- | --- | --- |
 | Manuscript v0.1 | `docs/paper/02_manuscript_v0_1.md` | 技术初稿完成，题目已确认数字普惠金融主线 | 可作为正文扩写底稿；最终定稿前需随人口稳健性、正式异质性和政策文本 validated LLM 结果更新 |
 | Manuscript v0.2 | `docs/paper/03_manuscript_v0_2.md` | 可评审完整初稿完成 | 当前最完整正文底稿；可用于内部评审、答辩结构演练和后续格式化，正式提交前仍需补齐参考文献格式、表图排版和 AI 使用说明 |
+| Submission candidate | `docs/paper/04_submission_manuscript_candidate.md` | 投稿候选稿完成 | 从 v0.2 整理而来，去除内部复现命令和表图清单，补入候选参考文献；用于转 Word、人工改写、查重和最终排版 |
 
 ## 表格
 

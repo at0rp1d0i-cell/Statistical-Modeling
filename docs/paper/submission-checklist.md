@@ -12,13 +12,13 @@
 | AI 工具使用情况表 | 待用户/队伍填写 | 官方通知列为参赛材料；AI 使用规范要求披露并保留必要材料 | 根据实际使用 Codex/Claude/LLM 情况如实填写 |
 | 承诺书 | 待用户/队伍填写 | 官方通知列为参赛材料 | 使用大赛附件模板 |
 | 报名表 | 待用户/队伍填写 | 官方通知列为参赛材料 | 使用大赛附件模板 |
-| 论文 | v0.2 初稿完成 | `docs/paper/03_manuscript_v0_2.md` | 转 Word/排版/压缩字数 |
+| 论文 | 投稿候选稿完成 | `docs/paper/04_submission_manuscript_candidate.md` | 转 Word/排版/压缩字数/人工改写 |
 | 数据包 | 部分就绪 | `data/raw/`, `data/interim/`, `outputs/` | 整理可公开提交版本，剔除不应提交的原始授权数据 |
 | 代码包 | 基本就绪 | `src/`, `tests/`, `README.md`, `environment.yml` | 最终重跑并写运行说明 |
 
 ## 2. 论文定稿任务
 
-- [ ] 将 `docs/paper/03_manuscript_v0_2.md` 转成 Word 正式稿，并由参赛队人工审阅、改写和确认正文表述。
+- [ ] 将 `docs/paper/04_submission_manuscript_candidate.md` 转成 Word 正式稿，并由参赛队人工审阅、改写和确认正文表述。
 - [ ] 统一标题、摘要、关键词、一级/二级标题格式。
 - [ ] 将正文表图编号与 `docs/paper/table-figure-inventory.md` 对齐。
 - [ ] 决定 Table 5 / Figure 4 / Table 13 是否全部放入技术附录。
@@ -78,7 +78,7 @@
 
 ## 6. 当前最短冲刺路径
 
-1. 先把 `03_manuscript_v0_2.md` 转成 Word 初稿，并进行人工改写确认。
+1. 先把 `04_submission_manuscript_candidate.md` 转成 Word 初稿，并进行人工改写确认。
 2. 按 Table/Figure inventory 插入正文表图占位。
 3. 统一参考文献格式。
 4. 做一次最终重跑和测试。

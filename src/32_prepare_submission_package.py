@@ -21,6 +21,7 @@ from stat_modeling.config import PROJECT_ROOT
 
 PAPER_DOC_FILES = (
     "03_manuscript_v0_2.md",
+    "04_submission_manuscript_candidate.md",
     "references.md",
     "references.bib",
     "submission-checklist.md",
@@ -218,7 +219,7 @@ def write_package_manifest(
         [
             "## 下一步人工任务",
             "",
-            "1. 将 `paper/03_manuscript_v0_2.md` 转为 Word 正式稿并人工改写。",
+            "1. 将 `paper/04_submission_manuscript_candidate.md` 转为 Word 正式稿并人工改写。",
             "2. 按学校/赛区模板填写 AI 工具使用情况表、承诺书和报名表。",
             "3. 做查重并控制在官方要求范围内。",
             "4. 核对参考文献元数据和数据源引用。",
