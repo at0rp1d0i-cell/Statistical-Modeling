@@ -226,6 +226,23 @@
 - 当前真实 ATE 位于随机置换分布尾部，支持主结果不是由随机处理变量排列产生
 - 该结果仍是候选稳健性证据；最终样本、控制变量和 DML 规格锁定后需重跑
 
+### 14. DML 学习器替换候选稳健性已补充
+
+- 已扩展 `src/06_robustness.py`，导出 DML nuisance 学习器替换检验
+- 已生成：
+  - `outputs/tables/table_08_dml_learner_replacement_candidate.csv`
+  - `outputs/tables/table_08_dml_learner_replacement_candidate.tex`
+- 当前候选结果：
+  - GradientBoosting baseline: ATE = `-0.0541`，95% CI = `[-0.0952, -0.0130]`，p-value = `0.0098`
+  - RandomForest replacement: ATE = `-0.0383`，95% CI = `[-0.0761, -0.0005]`，p-value = `0.0472`
+  - ExtraTrees replacement: ATE = `-0.0393`，95% CI = `[-0.0775, -0.0012]`，p-value = `0.0432`
+
+说明：
+
+- 三组学习器下 ATE 均为负，说明主结果方向对 nuisance learner 替换具有一定稳定性
+- 替换学习器后的效应绝对值有所收缩，显著性接近 5% 临界值，因此写作时应表述为“方向稳定但强度存在一定模型敏感性”
+- 最终样本、控制变量和主学习器设定锁定后需重跑
+
 ## 对写作的直接影响
 
 1. 摘要中可以直接写“已形成 2019—2023 年城市级 DML 候选样本”
@@ -238,3 +255,4 @@
 8. OLS TWFE 对照已经可写入稳健性章节，但必须说明它是候选线性基准参照且总量口径与 DML 存在差异
 9. 当前政策文本 seed 表图只用于技术附录，不作为正文主结果或最终机制证据
 10. Placebo 检验可以写入稳健性章节，但需标注为 residual-permutation 候选检验
+11. 学习器替换检验可以写入稳健性章节，但需说明效应强度对学习器存在一定敏感性

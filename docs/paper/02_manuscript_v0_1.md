@@ -146,6 +146,8 @@ D = m(X) + V, \quad E[V|X] = 0.
 
 `Table 7` 和 `Figure 5` 进一步报告 DML 残差置换安慰剂检验。本文在主结果变量碳排放强度口径下，对残差化后的处理变量进行 500 次随机置换，并重新估计 placebo ATE 分布。结果显示，真实 ATE 为 -0.0541，而 placebo 分布均值为 0.0009，标准差为 0.0183，2.5% 与 97.5% 分位数分别为 -0.0351 和 0.0359；基于双侧极端值计算的经验 p-value 为 0.0040。该结果表明，当前真实估计值位于随机置换分布尾部，从安慰剂检验角度支持基准 DML 结果并非由随机处理变量排列产生。需要说明的是，该检验仍属于候选稳健性证据，最终样本和规格锁定后需重跑。
 
+`Table 8` 报告 DML 学习器替换候选稳健性检验。在保持样本、处理变量、结果变量、控制变量、城市分组交叉拟合和城市聚类标准误一致的条件下，将 nuisance model 从基准 Gradient Boosting 替换为 Random Forest 和 Extra Trees。结果显示，Gradient Boosting 基准 ATE 为 -0.0541，Random Forest 替换后 ATE 为 -0.0383，Extra Trees 替换后 ATE 为 -0.0393，三个估计均为负，且替换学习器下的置信区间上界仍略低于 0。该结果说明，主结论方向并不完全依赖单一机器学习器选择；但替换学习器后的估计绝对值有所收缩、显著性接近 5% 临界值，因此更稳妥的表述是“方向稳定但效应强度存在一定模型敏感性”。
+
 ### 6.4 候选异质性分析
 
 `Table 3`、`Table 4` 和 `Figure 3` 展示当前候选异质性结果。当前 CATE 均值为 -0.0516，中位数为 -0.0323，方向与基准 DML 的平均效应一致。这说明在当前技术实现下，因果森林估计的城市层面边际效应总体支持数字普惠金融降低碳排放强度的方向。
@@ -166,7 +168,7 @@ D = m(X) + V, \quad E[V|X] = 0.
 
 ## 8 局限性与后续工作
 
-本文当前仍存在若干限制。第一，当前样本仍是候选样本，最终是否补齐个别缺失城市、是否采用平衡面板以及是否调整样本窗口仍需确认。第二，人口规模变量存在跨年口径风险，目前未进入主规格，后续需要决定是否作为敏感性控制变量加入。第三，稳健性检验仍不完整，虽然已经补充 OLS 双向固定效应候选对照和 DML 残差置换安慰剂检验，但仍需补充学习器替换和变量替换等检验。第四，当前异质性结果仍是技术预检查，缺少最终理论分组和 headline 异质性解释。第五，政策文本机制仍处于 seed rule-proxy 阶段，尚不能代表完整 LLM 政策文本分析结果。
+本文当前仍存在若干限制。第一，当前样本仍是候选样本，最终是否补齐个别缺失城市、是否采用平衡面板以及是否调整样本窗口仍需确认。第二，人口规模变量存在跨年口径风险，目前未进入主规格，后续需要决定是否作为敏感性控制变量加入。第三，稳健性检验仍需继续完善，虽然已经补充 OLS 双向固定效应候选对照、DML 残差置换安慰剂检验和学习器替换检验，但仍需补充变量替换、最终样本重跑和必要的敏感性分析。第四，当前异质性结果仍是技术预检查，缺少最终理论分组和 headline 异质性解释。第五，政策文本机制仍处于 seed rule-proxy 阶段，尚不能代表完整 LLM 政策文本分析结果。
 
 后续工作将围绕四条线推进：一是锁定最终样本和变量口径；二是补充完整稳健性检验；三是确定正式异质性维度并输出分组结果；四是扩展政策文本语料并建立 validated LLM scoring 流程。完成上述工作后，本文可从 v0.1 技术初稿推进为可投稿或参赛定稿版本。
 
@@ -193,6 +195,7 @@ D = m(X) + V, \quad E[V|X] = 0.
 - `Table 5`: `outputs/tables/table_05_policy_seed_mechanism_candidate.csv` / `.tex`
 - `Table 6`: `outputs/tables/table_06_ols_twfe_candidate.csv` / `.tex`
 - `Table 7`: `outputs/tables/table_07_dml_placebo_candidate_summary.csv` / `.tex`
+- `Table 8`: `outputs/tables/table_08_dml_learner_replacement_candidate.csv` / `.tex`
 - `Figure 1`: `outputs/figures/figure_01_digital_finance_carbon_intensity_trends.pdf`
 - `Figure 2`: `outputs/figures/figure_02_dml_effect_intervals.pdf`
 - `Figure 3`: `outputs/figures/figure_03_candidate_cate_distribution.pdf`

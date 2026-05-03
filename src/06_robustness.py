@@ -12,6 +12,9 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
+from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor
 
 from stat_modeling.config import FIGURES_DIR
 from stat_modeling.config import INTERIM_DATA_DIR
@@ -32,6 +35,8 @@ DEFAULT_PLACEBO_SUMMARY_CSV = TABLES_DIR / "table_07_dml_placebo_candidate_summa
 DEFAULT_PLACEBO_SUMMARY_TEX = TABLES_DIR / "table_07_dml_placebo_candidate_summary.tex"
 DEFAULT_PLACEBO_DISTRIBUTION_CSV = TABLES_DIR / "table_07_dml_placebo_candidate_distribution.csv"
 DEFAULT_PLACEBO_FIGURE = FIGURES_DIR / "figure_05_dml_placebo_distribution.pdf"
+DEFAULT_LEARNER_CSV = TABLES_DIR / "table_08_dml_learner_replacement_candidate.csv"
+DEFAULT_LEARNER_TEX = TABLES_DIR / "table_08_dml_learner_replacement_candidate.tex"
 DEFAULT_TREATMENT = "digital_inclusive_finance_index"
 DEFAULT_OUTCOMES = "co2_emission_intensity,co2_emission_total"
 DEFAULT_CONTROLS = "gdp_total,secondary_industry_share,fiscal_expenditure"
@@ -143,9 +148,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--placebo-summary-tex-path", type=Path, default=DEFAULT_PLACEBO_SUMMARY_TEX)
     parser.add_argument("--placebo-distribution-csv-path", type=Path, default=DEFAULT_PLACEBO_DISTRIBUTION_CSV)
     parser.add_argument("--placebo-figure-path", type=Path, default=DEFAULT_PLACEBO_FIGURE)
+    parser.add_argument("--learner-csv-path", type=Path, default=DEFAULT_LEARNER_CSV)
+    parser.add_argument("--learner-tex-path", type=Path, default=DEFAULT_LEARNER_TEX)
     parser.add_argument("--treatment-column", default=DEFAULT_TREATMENT)
     parser.add_argument("--outcome-columns", default=DEFAULT_OUTCOMES)
     parser.add_argument("--placebo-outcome-column", default="co2_emission_intensity")
+    parser.add_argument("--learner-outcome-column", default="co2_emission_intensity")
     parser.add_argument("--control-columns", default=DEFAULT_CONTROLS)
     parser.add_argument("--entity-column", default="pku_city_code")
     parser.add_argument("--time-column", default="year")
@@ -459,6 +467,119 @@ def export_placebo_outputs(
     }
 
 
+def build_learner_specs(random_seed: int) -> list[tuple[str, object]]:
+    return [
+        ("GradientBoosting baseline", GradientBoostingRegressor(random_state=random_seed)),
+        (
+            "RandomForest replacement",
+            RandomForestRegressor(
+                n_estimators=100,
+                min_samples_leaf=5,
+                random_state=random_seed,
+                n_jobs=-1,
+            ),
+        ),
+        (
+            "ExtraTrees replacement",
+            ExtraTreesRegressor(
+                n_estimators=100,
+                min_samples_leaf=5,
+                random_state=random_seed,
+                n_jobs=-1,
+            ),
+        ),
+    ]
+
+
+def build_learner_replacement_table(
+    frame: pd.DataFrame,
+    outcome_column: str,
+    treatment_column: str,
+    control_columns: list[str],
+    group_column: str,
+    cluster_column: str,
+    folds: int,
+    random_seed: int,
+) -> pd.DataFrame:
+    rows: list[dict[str, object]] = []
+    for learner_label, learner_model in build_learner_specs(random_seed):
+        result = fit_partial_linear_dml(
+            frame=frame,
+            outcome_column=outcome_column,
+            treatment_column=treatment_column,
+            control_columns=control_columns,
+            folds=folds,
+            random_seed=random_seed,
+            group_column=group_column,
+            cluster_column=cluster_column,
+            model_y=learner_model,
+            model_t=learner_model,
+        )
+        rows.append(
+            {
+                "model": "DML_learner_replacement_candidate",
+                "learner_label": learner_label,
+                "outcome_column": outcome_column,
+                "outcome_label_cn": OUTCOME_LABELS_CN.get(outcome_column, outcome_column),
+                "outcome_label_en": OUTCOME_LABELS_EN.get(outcome_column, outcome_column),
+                "treatment_column": treatment_column,
+                "ate": result.ate,
+                "std_error": result.std_error,
+                "ci_lower": result.ci_lower,
+                "ci_upper": result.ci_upper,
+                "p_value": result.p_value,
+                "nobs": result.nobs,
+                "folds": result.folds,
+                "split_strategy": result.split_strategy,
+                "covariance_type": result.covariance_type,
+                "nuisance_model_y": result.nuisance_model_y,
+                "nuisance_model_t": result.nuisance_model_t,
+                "control_columns": ", ".join(control_columns),
+                "caveat": "Candidate learner-replacement robustness only; rerun after final specification lock.",
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def format_learner_replacement_latex(table: pd.DataFrame) -> str:
+    display = table[
+        [
+            "learner_label",
+            "ate",
+            "std_error",
+            "ci_lower",
+            "ci_upper",
+            "p_value",
+            "nobs",
+        ]
+    ].copy()
+    display.columns = [
+        "学习器",
+        "ATE",
+        "标准误",
+        "95%CI下限",
+        "95%CI上限",
+        "P值",
+        "样本量",
+    ]
+    for column in ["ATE", "标准误", "95%CI下限", "95%CI上限", "P值"]:
+        display[column] = display[column].map(lambda value: f"{value:.4f}")
+    display["样本量"] = display["样本量"].astype(int).astype(str)
+    return display.to_latex(
+        index=False,
+        escape=False,
+        caption="DML 学习器替换候选稳健性检验",
+        label="tab:dml_learner_replacement_candidate",
+    )
+
+
+def export_learner_replacement_table(table: pd.DataFrame, output_csv_path: Path, output_tex_path: Path) -> dict[str, Path]:
+    csv_path = write_table(table, output_csv_path)
+    output_tex_path.parent.mkdir(parents=True, exist_ok=True)
+    output_tex_path.write_text(format_learner_replacement_latex(table), encoding="utf-8")
+    return {"csv_path": csv_path, "tex_path": output_tex_path}
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -504,6 +625,24 @@ def main(argv: Sequence[str] | None = None) -> int:
     print(f"Placebo distribution written to: {placebo_outputs['distribution_csv_path']}")
     print(f"Placebo figure written to: {placebo_outputs['figure_path']}")
     print("Boundary note: placebo output is candidate evidence until final sample/specification lock.")
+    learner_table = build_learner_replacement_table(
+        frame=frame,
+        outcome_column=args.learner_outcome_column,
+        treatment_column=args.treatment_column,
+        control_columns=control_columns,
+        group_column=args.entity_column,
+        cluster_column=args.cluster_column,
+        folds=args.folds,
+        random_seed=args.random_seed,
+    )
+    learner_outputs = export_learner_replacement_table(
+        learner_table,
+        args.learner_csv_path,
+        args.learner_tex_path,
+    )
+    print(f"Learner replacement CSV written to: {learner_outputs['csv_path']}")
+    print(f"Learner replacement LaTeX written to: {learner_outputs['tex_path']}")
+    print("Boundary note: learner replacement output is candidate evidence until final specification lock.")
     return 0
 
 

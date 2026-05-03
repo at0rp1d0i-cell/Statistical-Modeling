@@ -211,6 +211,14 @@
 
 解释边界：该安慰剂检验是候选稳健性证据；最终样本、控制变量与 DML 规格锁定后需重跑。
 
+已补充 DML 学习器替换候选稳健性检验 `Table 8`。在保持相同样本、处理变量、结果变量、控制变量、城市分组交叉拟合和城市聚类标准误的条件下，替换 nuisance model 后的结果为：
+
+- GradientBoosting baseline：ATE = `-0.0541`，95% CI = `[-0.0952, -0.0130]`，p-value = `0.0098`
+- RandomForest replacement：ATE = `-0.0383`，95% CI = `[-0.0761, -0.0005]`，p-value = `0.0472`
+- ExtraTrees replacement：ATE = `-0.0393`，95% CI = `[-0.0775, -0.0012]`，p-value = `0.0432`
+
+这说明主结果的负向方向在不同树模型学习器下保持一致，但随机森林与极端随机树规格下显著性接近 5% 临界值，最终表述应写成“方向稳定、强度略有变化”，而不是过度强调估计大小完全一致。
+
 ## 十一、当前异质性技术运行状态（阶段性）
 
 在候选异质性特征集
@@ -285,7 +293,7 @@
 
 稳健性结果同样对应 `Table 2` 和 `Figure 2`。将结果变量替换为 `co2_emission_total` 后，ATE 为 `-129.93`，95% 置信区间为 `[-224.18, -35.67]`，p-value 为 `0.0069`。当前可以写作：总量口径下的估计方向与强度口径一致，说明基准结论并非仅依赖碳排放强度定义。
 
-但本部分还不是完整稳健性章节。当前已补充 OLS 双向固定效应候选对照 `Table 6`：强度口径系数为 `-0.0668`，95% CI = `[-0.1068, -0.0267]`，p-value = `0.0011`；总量口径系数为 `48.3482`，95% CI = `[-6.8023, 103.4988]`，p-value = `0.0858`。这意味着 OLS TWFE 在强度口径上支持主方向，但在总量口径上没有复制 DML 的负向显著结果。当前还补充了 DML 残差置换安慰剂检验 `Table 7` 和 `Figure 5`：500 次 placebo 的经验 p-value 为 `0.0040`，真实 ATE 位于随机置换分布尾部。后续仍需补充学习器替换和变量口径审查。
+但本部分还不是完整稳健性章节。当前已补充 OLS 双向固定效应候选对照 `Table 6`：强度口径系数为 `-0.0668`，95% CI = `[-0.1068, -0.0267]`，p-value = `0.0011`；总量口径系数为 `48.3482`，95% CI = `[-6.8023, 103.4988]`，p-value = `0.0858`。这意味着 OLS TWFE 在强度口径上支持主方向，但在总量口径上没有复制 DML 的负向显著结果。当前还补充了 DML 残差置换安慰剂检验 `Table 7` 和 `Figure 5`：500 次 placebo 的经验 p-value 为 `0.0040`，真实 ATE 位于随机置换分布尾部。`Table 8` 显示，替换为 RandomForest 和 ExtraTrees 后，主结果 ATE 仍为负且在 5% 水平附近显著，说明方向具有一定稳定性。后续仍需变量口径审查和最终样本重跑。
 
 ### 13.4 候选异质性分析
 
@@ -318,6 +326,8 @@ python3 src/25_export_result_figures.py
 - `outputs/tables/table_07_dml_placebo_candidate_summary.csv`
 - `outputs/tables/table_07_dml_placebo_candidate_summary.tex`
 - `outputs/tables/table_07_dml_placebo_candidate_distribution.csv`
+- `outputs/tables/table_08_dml_learner_replacement_candidate.csv`
+- `outputs/tables/table_08_dml_learner_replacement_candidate.tex`
 - `outputs/figures/figure_01_digital_finance_carbon_intensity_trends.pdf`
 - `outputs/figures/figure_02_dml_effect_intervals.pdf`
 - `outputs/figures/figure_03_candidate_cate_distribution.pdf`

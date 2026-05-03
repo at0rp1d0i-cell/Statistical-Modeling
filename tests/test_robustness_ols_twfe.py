@@ -12,6 +12,8 @@ def test_robustness_exports_ols_twfe_candidate_table(tmp_path):
     placebo_summary_tex = tmp_path / "table_07_summary.tex"
     placebo_distribution_csv = tmp_path / "table_07_distribution.csv"
     placebo_figure = tmp_path / "figure_05.pdf"
+    learner_csv = tmp_path / "table_08.csv"
+    learner_tex = tmp_path / "table_08.tex"
 
     rows = []
     for city_id, city_effect in [(1101, 0.2), (1202, -0.1), (1303, 0.05), (1404, -0.05), (1505, 0.1), (1606, -0.2)]:
@@ -52,6 +54,10 @@ def test_robustness_exports_ols_twfe_candidate_table(tmp_path):
             str(placebo_distribution_csv),
             "--placebo-figure-path",
             str(placebo_figure),
+            "--learner-csv-path",
+            str(learner_csv),
+            "--learner-tex-path",
+            str(learner_tex),
             "--placebo-permutations",
             "20",
             "--folds",
@@ -80,3 +86,12 @@ def test_robustness_exports_ols_twfe_candidate_table(tmp_path):
     assert placebo_summary["permutations"].iloc[0] == 20
     assert len(placebo_distribution) == 20
     assert "empirical_p_value" in placebo_summary.columns
+    assert learner_csv.exists()
+    assert learner_tex.exists()
+    learners = pd.read_csv(learner_csv)
+    assert set(learners["learner_label"]) == {
+        "GradientBoosting baseline",
+        "RandomForest replacement",
+        "ExtraTrees replacement",
+    }
+    assert set(learners["model"]) == {"DML_learner_replacement_candidate"}

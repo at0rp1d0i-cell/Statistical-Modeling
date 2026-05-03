@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
+from sklearn.base import BaseEstimator
 from sklearn.base import clone
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import GroupKFold
@@ -65,6 +66,8 @@ def residualize_partial_linear_dml(
     random_seed: int = 42,
     group_column: str | None = None,
     cluster_column: str | None = None,
+    model_y: BaseEstimator | None = None,
+    model_t: BaseEstimator | None = None,
 ) -> DMLResiduals:
     if not control_columns:
         raise ValueError("control_columns cannot be empty for partial linear DML")
@@ -83,8 +86,8 @@ def residualize_partial_linear_dml(
     x = model_frame[control_columns].to_numpy(dtype=float)
     groups = model_frame[group_column].to_numpy() if group_column else None
 
-    model_y = GradientBoostingRegressor(random_state=random_seed)
-    model_t = GradientBoostingRegressor(random_state=random_seed)
+    model_y = model_y if model_y is not None else GradientBoostingRegressor(random_state=random_seed)
+    model_t = model_t if model_t is not None else GradientBoostingRegressor(random_state=random_seed)
     if group_column:
         splitter = GroupKFold(n_splits=folds)
         splits = splitter.split(x, groups=groups)
@@ -128,6 +131,8 @@ def fit_partial_linear_dml(
     random_seed: int = 42,
     group_column: str | None = None,
     cluster_column: str | None = None,
+    model_y: BaseEstimator | None = None,
+    model_t: BaseEstimator | None = None,
 ) -> DMLResult:
     residuals = residualize_partial_linear_dml(
         frame=frame,
@@ -138,6 +143,8 @@ def fit_partial_linear_dml(
         random_seed=random_seed,
         group_column=group_column,
         cluster_column=cluster_column,
+        model_y=model_y,
+        model_t=model_t,
     )
     clusters = residuals.model_frame[cluster_column].to_numpy() if cluster_column else None
 
