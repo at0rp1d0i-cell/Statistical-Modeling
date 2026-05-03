@@ -43,7 +43,7 @@ python3 src/08_policy_text.py --help
 3. `src/03_eda.py` (Table 1 descriptive statistics)
 4. `src/04_dml_main.py`
 5. `src/05_heterogeneity.py`
-6. `src/06_robustness.py`
+6. `src/06_robustness.py` (candidate OLS TWFE robustness comparison)
 7. `src/07_spatial.py` (optional)
 8. `src/08_policy_text.py` (mechanism/moderation support lane)
 
@@ -114,10 +114,11 @@ The current paper-writing entrypoints are:
 - `docs/paper/02_manuscript_v0_1.md` — continuous v0.1 manuscript draft for expansion
 - `docs/paper/table-figure-inventory.md` — table, figure, and manuscript asset inventory
 
-Current candidate-sample descriptive statistics can be regenerated with:
+Current candidate-sample descriptive and robustness tables can be regenerated with:
 
 ```bash
 python3 src/03_eda.py
+python3 src/06_robustness.py
 ```
 
 First-pass figure assets can be regenerated with:

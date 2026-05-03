@@ -17,6 +17,7 @@
 | Table 3 | `outputs/tables/table_03_heterogeneity_candidate_summary.csv` / `.tex` | `src/15_export_table_03.py` | 候选完成 | CATE 技术结果摘要，非最终 headline 异质性结论 |
 | Table 4 | `outputs/tables/table_04_heterogeneity_candidate_city_extremes.csv` / `.tex` | `src/16_export_table_04.py` | 候选完成 | 城市 CATE 极值展示，非最终 headline 异质性结论 |
 | Table 5 | `outputs/tables/table_05_policy_seed_mechanism_candidate.csv` / `.tex` | `src/23_mechanism_seed_regression.py`, `src/24_export_table_05.py` | seed 候选完成 | 规则代理 seed 机制证据，不能写成最终 LLM 机制结论 |
+| Table 6 | `outputs/tables/table_06_ols_twfe_candidate.csv` / `.tex` | `src/06_robustness.py` | 候选完成 | OLS 城市与年份双向固定效应对照；用于稳健性参照，不替代 DML 主识别 |
 
 ## 图形
 
@@ -30,8 +31,8 @@
 
 ## 下一批表图缺口
 
-1. OLS 双向固定效应对照表。
-2. 安慰剂检验分布图。
+1. 安慰剂检验分布图。
+2. 学习器替换稳健性表。
 3. 正式异质性分组图（需先锁定 headline 分组）。
 4. validated LLM 政策文本评分图/表（需先完成完整语料与校验）。
-5. 最终定稿前随最终样本与规格重跑 Table 1。
+5. 最终定稿前随最终样本与规格重跑 Table 1 和 Table 6。

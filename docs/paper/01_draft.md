@@ -200,6 +200,13 @@
 这一结果说明，在当前主样本与当前控制集下，数字普惠金融的提升不仅对应碳排放强度下降，也对应碳排放总量下降，方向与主结果一致。
 但该结果同样属于首轮阶段性估计，后续仍需结合稳健性扩展、异质性分析和正式写作口径进一步审视。
 
+已补充候选 OLS 双向固定效应对照 `Table 6`。该表使用相同处理变量与控制变量，并加入城市固定效应、年份固定效应和城市聚类标准误。当前候选结果为：
+
+- 碳排放强度：系数 `-0.0668`，95% CI = `[-0.1068, -0.0267]`，p-value = `0.0011`
+- 碳排放总量：系数 `48.3482`，95% CI = `[-6.8023, 103.4988]`，p-value = `0.0858`
+
+解释边界：OLS TWFE 是候选稳健性参照，不替代 DML 主识别。当前强度口径与 DML 主结果方向一致；总量口径在 TWFE 下未复制 DML 的负向显著结果，提示后续需要继续补充安慰剂检验、学习器替换和变量口径审查。
+
 ## 十一、当前异质性技术运行状态（阶段性）
 
 在候选异质性特征集
@@ -274,7 +281,7 @@
 
 稳健性结果同样对应 `Table 2` 和 `Figure 2`。将结果变量替换为 `co2_emission_total` 后，ATE 为 `-129.93`，95% 置信区间为 `[-224.18, -35.67]`，p-value 为 `0.0069`。当前可以写作：总量口径下的估计方向与强度口径一致，说明基准结论并非仅依赖碳排放强度定义。
 
-但本部分还不是完整稳健性章节，后续仍需补充 OLS 双向固定效应对照、安慰剂检验和学习器替换等结果。
+但本部分还不是完整稳健性章节。当前已补充 OLS 双向固定效应候选对照 `Table 6`：强度口径系数为 `-0.0668`，95% CI = `[-0.1068, -0.0267]`，p-value = `0.0011`；总量口径系数为 `48.3482`，95% CI = `[-6.8023, 103.4988]`，p-value = `0.0858`。这意味着 OLS TWFE 在强度口径上支持主方向，但在总量口径上没有复制 DML 的负向显著结果，后续仍需补充安慰剂检验、学习器替换和变量口径审查。
 
 ### 13.4 候选异质性分析
 
@@ -294,6 +301,7 @@
 
 ```bash
 python3 src/03_eda.py
+python3 src/06_robustness.py
 python3 src/25_export_result_figures.py
 ```
 
@@ -301,6 +309,8 @@ python3 src/25_export_result_figures.py
 
 - `outputs/tables/table_01_descriptive_statistics.csv`
 - `outputs/tables/table_01_descriptive_statistics.tex`
+- `outputs/tables/table_06_ols_twfe_candidate.csv`
+- `outputs/tables/table_06_ols_twfe_candidate.tex`
 - `outputs/figures/figure_01_digital_finance_carbon_intensity_trends.pdf`
 - `outputs/figures/figure_02_dml_effect_intervals.pdf`
 - `outputs/figures/figure_03_candidate_cate_distribution.pdf`
