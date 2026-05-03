@@ -219,6 +219,8 @@
 
 这说明主结果的负向方向在不同树模型学习器下保持一致，但随机森林与极端随机树规格下显著性接近 5% 临界值，最终表述应写成“方向稳定、强度略有变化”，而不是过度强调估计大小完全一致。
 
+已新增当前结论证据链汇总 `Table 9`。该表不是新增模型结果，而是将 DML 主结果、替换结果变量、OLS TWFE 对照、安慰剂检验、学习器替换、候选异质性和政策文本机制边界统一整理为写作与答辩用证据链。当前综合判断为：主效应证据较明确，稳健性总体支持但存在口径与模型敏感性；候选异质性方向一致但 headline 维度未锁定；政策文本机制仍是技术附录证据。
+
 ## 十一、当前异质性技术运行状态（阶段性）
 
 在候选异质性特征集
@@ -328,6 +330,8 @@ python3 src/25_export_result_figures.py
 - `outputs/tables/table_07_dml_placebo_candidate_distribution.csv`
 - `outputs/tables/table_08_dml_learner_replacement_candidate.csv`
 - `outputs/tables/table_08_dml_learner_replacement_candidate.tex`
+- `outputs/tables/table_09_current_evidence_synthesis.csv`
+- `outputs/tables/table_09_current_evidence_synthesis.tex`
 - `outputs/figures/figure_01_digital_finance_carbon_intensity_trends.pdf`
 - `outputs/figures/figure_02_dml_effect_intervals.pdf`
 - `outputs/figures/figure_03_candidate_cate_distribution.pdf`

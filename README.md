@@ -119,6 +119,7 @@ Current candidate-sample descriptive and robustness tables can be regenerated wi
 ```bash
 python3 src/03_eda.py
 python3 src/06_robustness.py
+python3 src/26_export_evidence_synthesis.py
 ```
 
 First-pass figure assets can be regenerated with:
@@ -127,7 +128,7 @@ First-pass figure assets can be regenerated with:
 python3 src/25_export_result_figures.py
 ```
 
-These commands write paper-facing tables under `outputs/tables/` and PDF figures plus a manifest under `outputs/figures/`. `src/06_robustness.py` currently exports the OLS TWFE candidate benchmark, the DML residual-permutation placebo check, and the DML learner-replacement robustness table. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs remain ignored by git unless explicitly force-added as final competition artifacts.
+These commands write paper-facing tables under `outputs/tables/` and PDF figures plus a manifest under `outputs/figures/`. `src/06_robustness.py` currently exports the OLS TWFE candidate benchmark, the DML residual-permutation placebo check, and the DML learner-replacement robustness table. `src/26_export_evidence_synthesis.py` exports the current evidence-chain synthesis table for writing and presentation. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs remain ignored by git unless explicitly force-added as final competition artifacts.
 
 ## Heterogeneity runtime note
 

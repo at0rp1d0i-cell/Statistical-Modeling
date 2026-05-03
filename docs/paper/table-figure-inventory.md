@@ -20,6 +20,7 @@
 | Table 6 | `outputs/tables/table_06_ols_twfe_candidate.csv` / `.tex` | `src/06_robustness.py` | 候选完成 | OLS 城市与年份双向固定效应对照；用于稳健性参照，不替代 DML 主识别 |
 | Table 7 | `outputs/tables/table_07_dml_placebo_candidate_summary.csv` / `.tex` | `src/06_robustness.py` | 候选完成 | DML 残差置换安慰剂检验；最终样本/规格锁定后需重跑 |
 | Table 8 | `outputs/tables/table_08_dml_learner_replacement_candidate.csv` / `.tex` | `src/06_robustness.py` | 候选完成 | DML nuisance 学习器替换检验；当前方向稳定，最终规格锁定后需重跑 |
+| Table 9 | `outputs/tables/table_09_current_evidence_synthesis.csv` / `.tex` | `src/26_export_evidence_synthesis.py` | 写作汇总完成 | 当前结论证据链汇总；不是新增模型结果，用于论文叙述和答辩沟通 |
 
 ## 图形
 
@@ -36,4 +37,4 @@
 
 1. 正式异质性分组图（需先锁定 headline 分组）。
 2. validated LLM 政策文本评分图/表（需先完成完整语料与校验）。
-3. 最终定稿前随最终样本与规格重跑 Table 1、Table 6、Table 7 和 Table 8。
+3. 最终定稿前随最终样本与规格重跑 Table 1、Table 6、Table 7、Table 8 和 Table 9。

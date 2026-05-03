@@ -148,6 +148,8 @@ D = m(X) + V, \quad E[V|X] = 0.
 
 `Table 8` 报告 DML 学习器替换候选稳健性检验。在保持样本、处理变量、结果变量、控制变量、城市分组交叉拟合和城市聚类标准误一致的条件下，将 nuisance model 从基准 Gradient Boosting 替换为 Random Forest 和 Extra Trees。结果显示，Gradient Boosting 基准 ATE 为 -0.0541，Random Forest 替换后 ATE 为 -0.0383，Extra Trees 替换后 ATE 为 -0.0393，三个估计均为负，且替换学习器下的置信区间上界仍略低于 0。该结果说明，主结论方向并不完全依赖单一机器学习器选择；但替换学习器后的估计绝对值有所收缩、显著性接近 5% 临界值，因此更稳妥的表述是“方向稳定但效应强度存在一定模型敏感性”。
 
+为便于论文写作和答辩沟通，`Table 9` 进一步汇总当前结论证据链。该表不是新的模型估计，而是将 DML 主结果、替换结果变量、OLS TWFE 对照、安慰剂检验、学习器替换、候选异质性和政策文本机制边界放在同一张表中。总体来看，DML 主结果、替换结果变量、OLS TWFE 强度口径、安慰剂检验和学习器替换均支持“数字普惠金融降低碳排放强度”的主线；但 OLS TWFE 总量口径呈现混合信号，候选异质性尚未形成 headline 结论，政策文本机制仍属于技术附录证据。因此，当前最稳妥的论文表述是：主效应证据较为明确，稳健性总体支持但存在口径与模型敏感性，机制和异质性仍需后续补强。
+
 ### 6.4 候选异质性分析
 
 `Table 3`、`Table 4` 和 `Figure 3` 展示当前候选异质性结果。当前 CATE 均值为 -0.0516，中位数为 -0.0323，方向与基准 DML 的平均效应一致。这说明在当前技术实现下，因果森林估计的城市层面边际效应总体支持数字普惠金融降低碳排放强度的方向。
@@ -176,7 +178,7 @@ D = m(X) + V, \quad E[V|X] = 0.
 
 本文基于 2019—2023 年中国地级市候选面板数据，采用双重机器学习方法考察数字普惠金融对城市碳排放强度的影响。当前首轮结果显示，数字普惠金融指数提升与城市碳排放强度下降显著相关；替换结果变量为碳排放总量后，估计方向保持一致。候选异质性分析提示城市间可能存在差异化减排效应，政策文本机制模块则为解释政策环境作用提供了可扩展技术接口。
 
-总体来看，当前证据支持将“数字普惠金融促进城市低碳转型”作为论文主线继续推进。但由于样本、控制变量、稳健性、异质性和政策文本评分仍有待最终锁定，本文结论目前应视为阶段性结果。正式定稿应在完整稳健性检验和 validated LLM 政策文本机制分析完成后进一步更新。
+总体来看，当前证据支持将“数字普惠金融促进城市低碳转型”作为论文主线继续推进。`Table 9` 对当前证据链的汇总显示，主效应、替换结果变量、强度口径 TWFE、安慰剂检验和学习器替换检验均在不同角度支持主命题；同时，总量口径 TWFE、候选异质性解释和政策文本机制仍提示后续需要继续完善。由于样本、控制变量、异质性和政策文本评分仍有待最终锁定，本文结论目前应视为阶段性结果。正式定稿应在最终样本重跑和 validated LLM 政策文本机制分析完成后进一步更新。
 
 ## 参考文献与资料入口（待正式格式化）
 
@@ -196,6 +198,7 @@ D = m(X) + V, \quad E[V|X] = 0.
 - `Table 6`: `outputs/tables/table_06_ols_twfe_candidate.csv` / `.tex`
 - `Table 7`: `outputs/tables/table_07_dml_placebo_candidate_summary.csv` / `.tex`
 - `Table 8`: `outputs/tables/table_08_dml_learner_replacement_candidate.csv` / `.tex`
+- `Table 9`: `outputs/tables/table_09_current_evidence_synthesis.csv` / `.tex`
 - `Figure 1`: `outputs/figures/figure_01_digital_finance_carbon_intensity_trends.pdf`
 - `Figure 2`: `outputs/figures/figure_02_dml_effect_intervals.pdf`
 - `Figure 3`: `outputs/figures/figure_03_candidate_cate_distribution.pdf`
