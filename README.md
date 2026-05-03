@@ -128,7 +128,7 @@ To export only the Word draft without rebuilding the full package:
 python3 src/33_export_submission_docx.py
 ```
 
-Use `--no-table-appendix` and/or `--no-figure-appendix` if you need a body-only DOCX. The default DOCX appends the current Table 1–13 CSV outputs and a Figure 1–6 insertion checklist at the end so tables and PDF figures can be moved into the正文 during Word/WPS editing.
+Use `--no-table-appendix` and/or `--no-figure-appendix` if you need a body-only DOCX. The default DOCX appends the current Table 1–13 CSV outputs and a Figure 1–6 insertion checklist at the end so tables and PDF/PNG/JPG figures can be moved into the正文 during Word/WPS editing.
 
 Optional derived/interim modeling data can be copied with:
 
@@ -183,7 +183,7 @@ python3 src/25_export_result_figures.py
 python3 src/27_export_heterogeneity_groups.py
 ```
 
-These commands write paper-facing tables under `outputs/tables/` and PDF figures plus a manifest under `outputs/figures/`. `src/06_robustness.py` currently exports the OLS TWFE candidate benchmark, the DML residual-permutation placebo check, and the DML learner-replacement robustness table. `src/26_export_evidence_synthesis.py` exports the current evidence-chain synthesis table for writing and presentation. `src/27_export_heterogeneity_groups.py` exports Table 10 and Figure 6 for the confirmed region / economic-development / industrial-structure heterogeneity dimensions. `src/28_export_population_sensitivity.py` exports Table 11 for the population-control sensitivity check. `src/29_export_heterogeneity_group_differences.py` exports Table 12 for city-level bootstrap group-difference diagnostics. `src/31_validate_policy_llm_scores.py` exports Table 13 for policy-text LLM validation readiness. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs and local submission bundles under `dist/` remain ignored by git unless explicitly force-added as final competition artifacts.
+These commands write paper-facing tables under `outputs/tables/` and PDF + PNG + JPG figures plus a manifest under `outputs/figures/`. `src/06_robustness.py` currently exports the OLS TWFE candidate benchmark, the DML residual-permutation placebo check, and the DML learner-replacement robustness table. `src/26_export_evidence_synthesis.py` exports the current evidence-chain synthesis table for writing and presentation. `src/27_export_heterogeneity_groups.py` exports Table 10 and Figure 6 for the confirmed region / economic-development / industrial-structure heterogeneity dimensions. `src/28_export_population_sensitivity.py` exports Table 11 for the population-control sensitivity check. `src/29_export_heterogeneity_group_differences.py` exports Table 12 for city-level bootstrap group-difference diagnostics. `src/31_validate_policy_llm_scores.py` exports Table 13 for policy-text LLM validation readiness. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs and local submission bundles under `dist/` remain ignored by git unless explicitly force-added as final competition artifacts.
 
 ## Heterogeneity runtime note
 

@@ -61,11 +61,23 @@ TABLE_FILES = (
 
 FIGURE_FILES = (
     "figure_01_digital_finance_carbon_intensity_trends.pdf",
+    "figure_01_digital_finance_carbon_intensity_trends.png",
+    "figure_01_digital_finance_carbon_intensity_trends.jpg",
     "figure_02_dml_effect_intervals.pdf",
+    "figure_02_dml_effect_intervals.png",
+    "figure_02_dml_effect_intervals.jpg",
     "figure_03_candidate_cate_distribution.pdf",
+    "figure_03_candidate_cate_distribution.png",
+    "figure_03_candidate_cate_distribution.jpg",
     "figure_04_policy_seed_mechanism_snapshot.pdf",
+    "figure_04_policy_seed_mechanism_snapshot.png",
+    "figure_04_policy_seed_mechanism_snapshot.jpg",
     "figure_05_dml_placebo_distribution.pdf",
+    "figure_05_dml_placebo_distribution.png",
+    "figure_05_dml_placebo_distribution.jpg",
     "figure_06_heterogeneity_groups.pdf",
+    "figure_06_heterogeneity_groups.png",
+    "figure_06_heterogeneity_groups.jpg",
     "figure_manifest.csv",
 )
 

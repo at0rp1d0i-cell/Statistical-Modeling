@@ -57,6 +57,8 @@ def test_export_heterogeneity_groups_runs_with_explicit_inputs(tmp_path):
     assert output_tex.exists()
     assert attached_csv.exists()
     assert figure_path.exists()
+    assert figure_path.with_suffix(".png").exists()
+    assert figure_path.with_suffix(".jpg").exists()
     exported = pd.read_csv(output_csv)
     assert len(exported) == 8
     assert set(exported["dimension_cn"]) == {"区域", "经济发展水平", "产业结构"}

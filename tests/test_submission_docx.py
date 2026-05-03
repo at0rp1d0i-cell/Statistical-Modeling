@@ -36,6 +36,8 @@ def test_export_submission_docx_includes_table_appendix(tmp_path):
         encoding="utf-8",
     )
     (figures_dir / "figure_01.pdf").write_text("fake pdf placeholder", encoding="utf-8")
+    (figures_dir / "figure_01.png").write_text("fake png placeholder", encoding="utf-8")
+    (figures_dir / "figure_01.jpg").write_text("fake jpg placeholder", encoding="utf-8")
 
     export_submission_docx(manuscript, output, tables_dir=tables_dir, figures_dir=figures_dir)
 
@@ -47,6 +49,8 @@ def test_export_submission_docx_includes_table_appendix(tmp_path):
     assert "附录：图件清单" in document_xml
     assert "Table 1 描述性统计" in document_xml
     assert "Figure 1 趋势图" in document_xml
+    assert "outputs/figures/figure_01.png" in document_xml
+    assert "outputs/figures/figure_01.jpg" in document_xml
     assert "Y" in document_xml
 
 
@@ -54,9 +58,12 @@ def test_submission_docx_uses_fallback_figures(tmp_path):
     figures_dir = tmp_path / "figures"
     figures_dir.mkdir()
     (figures_dir / "figure_05_dml_placebo_distribution.pdf").write_text("fake pdf placeholder", encoding="utf-8")
+    (figures_dir / "figure_05_dml_placebo_distribution.png").write_text("fake png placeholder", encoding="utf-8")
+    (figures_dir / "figure_05_dml_placebo_distribution.jpg").write_text("fake jpg placeholder", encoding="utf-8")
 
     figures = load_submission_figures(figures_dir)
 
     assert len(figures) == 1
     assert figures[0].figure_id == "Figure 5"
     assert figures[0].caption_cn == "DML 残差置换安慰剂检验分布"
+    assert figures[0].png_filename == "figure_05_dml_placebo_distribution.png"

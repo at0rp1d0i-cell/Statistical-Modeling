@@ -81,6 +81,8 @@ def test_robustness_exports_ols_twfe_candidate_table(tmp_path):
     assert placebo_summary_tex.exists()
     assert placebo_distribution_csv.exists()
     assert placebo_figure.exists()
+    assert placebo_figure.with_suffix(".png").exists()
+    assert placebo_figure.with_suffix(".jpg").exists()
     placebo_summary = pd.read_csv(placebo_summary_csv)
     placebo_distribution = pd.read_csv(placebo_distribution_csv)
     assert placebo_summary["permutations"].iloc[0] == 20

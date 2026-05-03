@@ -19,7 +19,7 @@
 ## 2. 论文定稿任务
 
 - [ ] 将 `docs/paper/04_submission_manuscript_candidate.md` 转成 Word 正式稿，并由参赛队人工审阅、改写和确认正文表述。
-- [x] 生成本地 Word 初稿：`python3 src/33_export_submission_docx.py`（默认追加 Table 1–13 表格附录和 Figure 1–6 图件清单，供 Word/WPS 内移动到正文）。
+- [x] 生成本地 Word 初稿：`python3 src/33_export_submission_docx.py`（默认追加 Table 1–13 表格附录和 Figure 1–6 图件清单，图件同时提供 PDF/PNG/JPG，供 Word/WPS 内移动到正文）。
 - [ ] 统一标题、摘要、关键词、一级/二级标题格式。
 - [ ] 将正文表图编号与 `docs/paper/table-figure-inventory.md` 对齐。
 - [ ] 决定 Table 5 / Figure 4 / Table 13 是否全部放入技术附录。
@@ -45,6 +45,7 @@
   ```
 - [x] 检查 `outputs/tables/*.tex` 是否满足三线表要求（`booktabs` 结构已存在）。
 - [x] 检查 `outputs/figures/*.pdf` 是否可正常识别为 PDF（当前合同图件均为 1 页 PDF）。
+- [x] 当前图件导出链路同时生成 PNG/JPG，便于 Word/WPS 插图。
 - [ ] 决定是否将最终表图从 ignored outputs 中 force-add 到提交包或单独压缩。
 
 ## 4. 数据与代码包任务

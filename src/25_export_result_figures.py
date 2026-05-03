@@ -14,6 +14,8 @@ from stat_modeling.config import FIGURES_DIR
 from stat_modeling.config import INTERIM_DATA_DIR
 from stat_modeling.config import TABLES_DIR
 from stat_modeling.config import ensure_project_directories
+from stat_modeling.delivery.figure_formats import companion_figure_paths
+from stat_modeling.delivery.figure_formats import save_figure_with_rasters
 
 
 DEFAULT_DML_TABLE = TABLES_DIR / "table_02_dml_main_and_robustness.csv"
@@ -84,11 +86,18 @@ def format_source(path: Path) -> str:
 
 
 def save_figure(fig: plt.Figure, output_path: Path) -> Path:
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.tight_layout()
-    fig.savefig(output_path, format="pdf", bbox_inches="tight")
+    outputs = save_figure_with_rasters(fig, output_path)
     plt.close(fig)
-    return output_path
+    return outputs["pdf"]
+
+
+def add_companion_raster_fields(record: dict[str, object]) -> dict[str, object]:
+    filename = record.get("filename")
+    if isinstance(filename, str) and filename.endswith(".pdf"):
+        paths = companion_figure_paths(Path(filename))
+        record["png_filename"] = paths["png"].name
+        record["jpg_filename"] = paths["jpg"].name
+    return record
 
 
 def normalize_first_year(series: pd.Series) -> pd.Series:
@@ -299,7 +308,7 @@ def export_policy_seed_snapshot_figure(
 
 def export_manifest(records: list[dict[str, object]], manifest_path: Path) -> Path:
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(records).to_csv(manifest_path, index=False)
+    pd.DataFrame([add_companion_raster_fields(record) for record in records]).to_csv(manifest_path, index=False)
     return manifest_path
 
 

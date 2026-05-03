@@ -328,6 +328,8 @@ class DocxFigure:
     figure_id: str
     filename: str
     caption_cn: str
+    png_filename: str = ""
+    jpg_filename: str = ""
     caption_en: str = ""
     caveat: str = ""
     source: str = ""
@@ -392,6 +394,10 @@ def _figure_appendix_xml(figures: list[DocxFigure]) -> str:
         title = f"{figure.figure_id} {figure.caption_cn}".strip()
         parts.append(_paragraph_xml(MarkdownBlock("heading", title, 2)))
         parts.append(_paragraph_xml(MarkdownBlock("paragraph", f"文件：outputs/figures/{figure.filename}")))
+        if figure.png_filename:
+            parts.append(_paragraph_xml(MarkdownBlock("paragraph", f"PNG：outputs/figures/{figure.png_filename}")))
+        if figure.jpg_filename:
+            parts.append(_paragraph_xml(MarkdownBlock("paragraph", f"JPG：outputs/figures/{figure.jpg_filename}")))
         if figure.caption_en:
             parts.append(_paragraph_xml(MarkdownBlock("paragraph", f"English caption: {figure.caption_en}")))
         if figure.caveat:

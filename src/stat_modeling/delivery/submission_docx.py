@@ -45,6 +45,8 @@ FALLBACK_FIGURE_SPECS = (
     {
         "figure_id": "Figure 5",
         "filename": "figure_05_dml_placebo_distribution.pdf",
+        "png_filename": "figure_05_dml_placebo_distribution.png",
+        "jpg_filename": "figure_05_dml_placebo_distribution.jpg",
         "caption_cn": "DML 残差置换安慰剂检验分布",
         "caption_en": "DML residual-permutation placebo distribution",
         "source": "outputs/tables/table_07_dml_placebo_candidate_distribution.csv",
@@ -54,6 +56,8 @@ FALLBACK_FIGURE_SPECS = (
     {
         "figure_id": "Figure 6",
         "filename": "figure_06_heterogeneity_groups.pdf",
+        "png_filename": "figure_06_heterogeneity_groups.png",
+        "jpg_filename": "figure_06_heterogeneity_groups.jpg",
         "caption_cn": "区域、经济发展水平和产业结构分组 CATE 均值",
         "caption_en": "Grouped CATE means by region, economic development, and industrial structure",
         "source": "outputs/tables/table_10_heterogeneity_group_summary.csv",
@@ -115,10 +119,19 @@ def load_submission_figures(figures_dir: Path = FIGURES_DIR) -> list[DocxFigure]
         filename = row.get("filename", "")
         if not filename or not (figures_dir / filename).exists():
             continue
+        stem = Path(filename).stem
+        png_filename = row.get("png_filename", "") or f"{stem}.png"
+        jpg_filename = row.get("jpg_filename", "") or f"{stem}.jpg"
+        if png_filename and not (figures_dir / png_filename).exists():
+            png_filename = ""
+        if jpg_filename and not (figures_dir / jpg_filename).exists():
+            jpg_filename = ""
         figures.append(
             DocxFigure(
                 figure_id=figure_id,
                 filename=filename,
+                png_filename=png_filename,
+                jpg_filename=jpg_filename,
                 caption_cn=row.get("caption_cn", ""),
                 caption_en=row.get("caption_en", ""),
                 caveat=row.get("caveat", ""),

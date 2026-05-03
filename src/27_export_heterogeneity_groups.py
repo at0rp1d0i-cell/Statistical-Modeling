@@ -14,6 +14,7 @@ from stat_modeling.config import FIGURES_DIR
 from stat_modeling.config import INTERIM_DATA_DIR
 from stat_modeling.config import TABLES_DIR
 from stat_modeling.config import ensure_project_directories
+from stat_modeling.delivery.figure_formats import save_figure_with_rasters
 from stat_modeling.data.io import write_table
 from stat_modeling.modeling.heterogeneity_groups import build_heterogeneity_group_summary
 
@@ -147,7 +148,7 @@ def export_group_figure(summary: pd.DataFrame, figure_path: Path) -> Path:
         color="#444444",
     )
     fig.tight_layout()
-    fig.savefig(figure_path, format="pdf", bbox_inches="tight")
+    save_figure_with_rasters(fig, figure_path)
     plt.close(fig)
     return figure_path
 

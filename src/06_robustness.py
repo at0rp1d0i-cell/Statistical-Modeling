@@ -21,6 +21,7 @@ from stat_modeling.config import INTERIM_DATA_DIR
 from stat_modeling.config import RANDOM_SEED
 from stat_modeling.config import TABLES_DIR
 from stat_modeling.config import ensure_project_directories
+from stat_modeling.delivery.figure_formats import save_figure_with_rasters
 from stat_modeling.data.io import read_table
 from stat_modeling.data.io import write_table
 from stat_modeling.modeling.dml import DMLResult
@@ -440,7 +441,7 @@ def save_placebo_figure(distribution: pd.DataFrame, summary: PlaceboSummary, out
     )
     ax.legend(frameon=False, loc="upper left")
     fig.tight_layout()
-    fig.savefig(output_path, format="pdf", bbox_inches="tight")
+    save_figure_with_rasters(fig, output_path)
     plt.close(fig)
     return output_path
 

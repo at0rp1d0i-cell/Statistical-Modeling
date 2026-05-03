@@ -9,7 +9,7 @@
 | Manuscript v0.1 | `docs/paper/02_manuscript_v0_1.md` | 技术初稿完成，题目已确认数字普惠金融主线 | 可作为正文扩写底稿；最终定稿前需随人口稳健性、正式异质性和政策文本 validated LLM 结果更新 |
 | Manuscript v0.2 | `docs/paper/03_manuscript_v0_2.md` | 可评审完整初稿完成 | 当前最完整正文底稿；可用于内部评审、答辩结构演练和后续格式化，正式提交前仍需补齐参考文献格式、表图排版和 AI 使用说明 |
 | Submission candidate | `docs/paper/04_submission_manuscript_candidate.md` | 投稿候选稿完成 | 从 v0.2 整理而来，去除内部复现命令和表图清单，补入候选参考文献；用于转 Word、人工改写、查重和最终排版 |
-| Submission DOCX | `dist/04_submission_manuscript_candidate.docx` | 本地生成 | 由 `src/33_export_submission_docx.py` 生成；默认将当前 Table 1–13 CSV 和 Figure 1–6 插图清单追加为文末附录，供 Word/WPS 编辑时移动到正文 |
+| Submission DOCX | `dist/04_submission_manuscript_candidate.docx` | 本地生成 | 由 `src/33_export_submission_docx.py` 生成；默认将当前 Table 1–13 CSV 和 Figure 1–6 插图清单追加为文末附录，图件提供 PDF/PNG/JPG，供 Word/WPS 编辑时移动到正文 |
 
 ## 表格
 
@@ -40,6 +40,8 @@
 | Figure 5 | `outputs/figures/figure_05_dml_placebo_distribution.pdf` | `src/06_robustness.py` | 候选完成 | DML 残差置换安慰剂分布图；用于稳健性章节候选证据 |
 | Figure 6 | `outputs/figures/figure_06_heterogeneity_groups.pdf` | `src/27_export_heterogeneity_groups.py` | 首轮完成 | 区域、经济发展水平、产业结构分组 CATE 均值与近似区间；用于异质性章节 |
 | Figure manifest | `outputs/figures/figure_manifest.csv` | `src/25_export_result_figures.py` | 已生成 | 记录图形 caption、来源与 caveat |
+
+> 图件格式说明：`src/25_export_result_figures.py`、`src/06_robustness.py` 和 `src/27_export_heterogeneity_groups.py` 当前均会为论文图件同时输出 `.pdf`、`.png` 和 `.jpg`。论文正式排版优先使用 PDF 或 PNG；JPG 主要用于兼容只接受位图的场景。
 
 ## 2026-05-03 本地重跑记录
 

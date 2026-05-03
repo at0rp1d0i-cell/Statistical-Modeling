@@ -73,6 +73,8 @@ def test_export_markdown_to_docx_can_append_figure_list(tmp_path):
     figure = DocxFigure(
         figure_id="Figure 1",
         filename="figure_01.pdf",
+        png_filename="figure_01.png",
+        jpg_filename="figure_01.jpg",
         caption_cn="趋势图",
         caption_en="Trend figure",
         caveat="Descriptive only.",
@@ -88,4 +90,6 @@ def test_export_markdown_to_docx_can_append_figure_list(tmp_path):
     assert "附录：图件清单" in document_xml
     assert "Figure 1 趋势图" in document_xml
     assert "outputs/figures/figure_01.pdf" in document_xml
+    assert "outputs/figures/figure_01.png" in document_xml
+    assert "outputs/figures/figure_01.jpg" in document_xml
     assert "Descriptive only." in document_xml
