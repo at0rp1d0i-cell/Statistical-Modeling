@@ -231,10 +231,14 @@
 
 ### 13.1 描述性事实与趋势
 
+可使用 `Table 1` 报告当前 2019—2023 年候选 DML 样本的描述性统计。该表由 `src/03_eda.py` 生成，当前覆盖 `1456` 个 city-year 观测，包括碳排放强度、碳排放总量、数字普惠金融指数及其三个分项、当前主规格控制变量，以及标记为“候选控制”的人口规模变量。
+
 可使用 `Figure 1` 展示 2019—2023 年样本城市数字普惠金融指数与碳排放强度的年度均值趋势。该图只说明变量随时间变化的描述性关系，不能作为因果证据。正文可围绕两个事实展开：
 
 1. 数字普惠金融在样本期内总体上升；
 2. 碳排放强度的变化方向可作为后续 DML 因果识别的背景事实。
+
+写作边界：`Table 1` 中的人口规模变量只能表述为候选控制变量，不能据此宣布已进入主规格；当前 `1456` 个观测也仍是候选样本规模，最终样本锁定前需重跑该表。
 
 ### 13.2 基准 DML 估计
 
@@ -267,14 +271,17 @@
 
 ### 13.6 当前表图资产
 
-当前表图清单维护在 `docs/paper/table-figure-inventory.md`。图形可由以下命令重新生成：
+当前表图清单维护在 `docs/paper/table-figure-inventory.md`。`Table 1` 与图形可由以下命令重新生成：
 
 ```bash
+python3 src/03_eda.py
 python3 src/25_export_result_figures.py
 ```
 
-该命令会输出：
+这些命令会输出：
 
+- `outputs/tables/table_01_descriptive_statistics.csv`
+- `outputs/tables/table_01_descriptive_statistics.tex`
 - `outputs/figures/figure_01_digital_finance_carbon_intensity_trends.pdf`
 - `outputs/figures/figure_02_dml_effect_intervals.pdf`
 - `outputs/figures/figure_03_candidate_cate_distribution.pdf`

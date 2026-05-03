@@ -6,7 +6,7 @@
 
 | 编号 | 文件 | 生成脚本 | 当前状态 | 论文使用边界 |
 | --- | --- | --- | --- | --- |
-| Table 1 | 待生成 | 待补描述统计脚本 | 缺口 | 需要补变量描述统计、样本量、均值、标准差、最小最大值 |
+| Table 1 | `outputs/tables/table_01_descriptive_statistics.csv` / `.tex` | `src/03_eda.py` | 首轮完成 | 当前 2019—2023 候选 DML 样本描述统计；人口变量仍标记为候选控制，不能视为最终控制口径 |
 | Table 2 | `outputs/tables/table_02_dml_main_and_robustness.csv` / `.tex` | `src/14_export_table_02.py` | 首轮完成 | 方案 B 主规格；不含 `population_control_candidate` |
 | Table 3 | `outputs/tables/table_03_heterogeneity_candidate_summary.csv` / `.tex` | `src/15_export_table_03.py` | 候选完成 | CATE 技术结果摘要，非最终 headline 异质性结论 |
 | Table 4 | `outputs/tables/table_04_heterogeneity_candidate_city_extremes.csv` / `.tex` | `src/16_export_table_04.py` | 候选完成 | 城市 CATE 极值展示，非最终 headline 异质性结论 |
@@ -24,8 +24,8 @@
 
 ## 下一批表图缺口
 
-1. `Table 1` 描述统计表。
-2. OLS 双向固定效应对照表。
-3. 安慰剂检验分布图。
-4. 正式异质性分组图（需先锁定 headline 分组）。
-5. validated LLM 政策文本评分图/表（需先完成完整语料与校验）。
+1. OLS 双向固定效应对照表。
+2. 安慰剂检验分布图。
+3. 正式异质性分组图（需先锁定 headline 分组）。
+4. validated LLM 政策文本评分图/表（需先完成完整语料与校验）。
+5. 最终定稿前随最终样本与规格重跑 Table 1。

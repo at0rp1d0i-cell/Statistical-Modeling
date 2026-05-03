@@ -40,7 +40,7 @@ python3 src/08_policy_text.py --help
 
 1. `src/01_data_clean.py`
 2. `src/02_dea_efficiency.py`
-3. `src/03_eda.py`
+3. `src/03_eda.py` (Table 1 descriptive statistics)
 4. `src/04_dml_main.py`
 5. `src/05_heterogeneity.py`
 6. `src/06_robustness.py`
@@ -108,13 +108,19 @@ Current first-pass robustness result uses `co2_emission_total` as the outcome un
 
 ## Reporting assets
 
+Current candidate-sample descriptive statistics can be regenerated with:
+
+```bash
+python3 src/03_eda.py
+```
+
 First-pass figure assets can be regenerated with:
 
 ```bash
 python3 src/25_export_result_figures.py
 ```
 
-This writes PDF figures and a manifest under `outputs/figures/`. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs remain ignored by git unless explicitly force-added as final competition artifacts.
+These commands write paper-facing tables under `outputs/tables/` and PDF figures plus a manifest under `outputs/figures/`. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs remain ignored by git unless explicitly force-added as final competition artifacts.
 
 ## Heterogeneity runtime note
 
