@@ -39,8 +39,16 @@
 | Figure 6 | `outputs/figures/figure_06_heterogeneity_groups.pdf` | `src/27_export_heterogeneity_groups.py` | 首轮完成 | 区域、经济发展水平、产业结构分组 CATE 均值与近似区间；用于异质性章节 |
 | Figure manifest | `outputs/figures/figure_manifest.csv` | `src/25_export_result_figures.py` | 已生成 | 记录图形 caption、来源与 caveat |
 
+## 2026-05-03 本地重跑记录
+
+- 已按 `docs/paper/submission-checklist.md` 的表图脚本顺序重跑：
+  `src/03_eda.py`、`src/06_robustness.py`、`src/28_export_population_sensitivity.py`、`src/27_export_heterogeneity_groups.py`、`src/29_export_heterogeneity_group_differences.py`、`src/30_prepare_policy_llm_scoring_batch.py`、`src/31_validate_policy_llm_scores.py`、`src/26_export_evidence_synthesis.py`、`src/25_export_result_figures.py`。
+- 生成物检查：`outputs/tables/table_01` 至 `table_13` 的当前合同文件均存在；所有 `table_*.tex` 均包含 `booktabs` 三线表结构。
+- 图件检查：`outputs/figures/figure_01` 至 `figure_06` 的当前合同 PDF 均存在，`file` 识别为 1 页 PDF；`figure_manifest.csv` 已生成。
+- 注意：`outputs/` 默认被 `.gitignore` 忽略；若最终提交包需要包含表图成品，应单独打包或按最终提交策略 force-add。
+
 ## 下一批表图缺口
 
 1. 实际 LLM 评分执行与抽样人工复核（需填充 `policy_llm_score_review_template_seed.csv` 或完整语料版本）。
 2. 异质性理论解释与政策含义段落。
-3. 最终定稿前随最终规格说明重跑 Table 1、Table 6、Table 7、Table 8、Table 9、Table 10、Table 11、Table 12 和 Table 13。
+3. 若后续调整样本、变量或模型规格，需再次重跑全部表图并更新本清单。

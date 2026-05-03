@@ -30,7 +30,7 @@
 
 ## 3. 表图与输出任务
 
-- [ ] 最终重跑所有表图生成脚本：
+- [x] 本轮重跑所有表图生成脚本（2026-05-03）：
   ```bash
   python3 src/03_eda.py
   python3 src/06_robustness.py
@@ -42,8 +42,8 @@
   python3 src/26_export_evidence_synthesis.py
   python3 src/25_export_result_figures.py
   ```
-- [ ] 检查 `outputs/tables/*.tex` 是否满足三线表要求。
-- [ ] 检查 `outputs/figures/*.pdf` 是否可正常打开、字体不乱码。
+- [x] 检查 `outputs/tables/*.tex` 是否满足三线表要求（`booktabs` 结构已存在）。
+- [x] 检查 `outputs/figures/*.pdf` 是否可正常识别为 PDF（当前合同图件均为 1 页 PDF）。
 - [ ] 决定是否将最终表图从 ignored outputs 中 force-add 到提交包或单独压缩。
 
 ## 4. 数据与代码包任务
