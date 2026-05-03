@@ -75,6 +75,7 @@ Current project-specific continuation scripts:
 30. `src/30_prepare_policy_llm_scoring_batch.py`
 31. `src/31_validate_policy_llm_scores.py`
 32. `src/32_prepare_submission_package.py`
+33. `src/33_export_submission_docx.py`
 
 ## Policy-text corpus lane
 
@@ -118,8 +119,14 @@ python3 src/32_prepare_submission_package.py
 ```
 
 The command writes `dist/submission_package_current/` and `dist/submission_package_current.zip`.
-The bundle includes the manuscript Markdown draft, reference files, table/figure outputs, source code,
-tests, `README.md`, `environment.yml`, and a `DATA_NOTICE.md` explaining why raw data are excluded by default.
+The bundle includes the manuscript Markdown draft, a generated DOCX draft, reference files, table/figure outputs,
+source code, tests, `README.md`, `environment.yml`, and a `DATA_NOTICE.md` explaining why raw data are excluded by default.
+
+To export only the Word draft without rebuilding the full package:
+
+```bash
+python3 src/33_export_submission_docx.py
+```
 
 Optional derived/interim modeling data can be copied with:
 

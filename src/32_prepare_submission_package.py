@@ -17,6 +17,8 @@ from pathlib import Path
 from typing import Iterable, Sequence
 
 from stat_modeling.config import PROJECT_ROOT
+from stat_modeling.delivery.docx_export import export_markdown_to_docx
+from stat_modeling.delivery.docx_export import validate_docx_package
 
 
 PAPER_DOC_FILES = (
@@ -79,6 +81,8 @@ DERIVED_DATA_FILES = (
 
 EXCLUDED_DIR_NAMES = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".git", ".omx"}
 EXCLUDED_FILE_SUFFIXES = {".pyc", ".pyo"}
+SUBMISSION_MARKDOWN_IN_PACKAGE = Path("paper/04_submission_manuscript_candidate.md")
+SUBMISSION_DOCX_IN_PACKAGE = Path("paper/04_submission_manuscript_candidate.docx")
 
 
 @dataclass(frozen=True)
@@ -180,6 +184,7 @@ def write_package_manifest(
 ) -> Path:
     manifest = package_dir / "MANIFEST.md"
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    docx_generated = (package_dir / SUBMISSION_DOCX_IN_PACKAGE).exists()
     lines = [
         "# 提交包清单",
         "",
@@ -187,7 +192,7 @@ def write_package_manifest(
         "",
         "## 内容结构",
         "",
-        "- `paper/`：论文 Markdown 初稿、参考文献、提交清单和表图清单。",
+        "- `paper/`：论文 Markdown 初稿、Word 初稿、参考文献、提交清单和表图清单。",
         "- `outputs/tables/`：论文表格 CSV 与 LaTeX。",
         "- `outputs/figures/`：论文图件 PDF 与 figure manifest。",
         "- `code/`：复现代码、测试与环境说明。",
@@ -206,6 +211,7 @@ def write_package_manifest(
         "",
         f"- 已复制资产数：{len(copied)}",
         f"- 缺失资产数：{len(missing)}",
+        f"- Word 初稿：{'已生成' if docx_generated else '未生成'}",
         f"- 包含派生数据：{'是' if include_derived_data else '否'}",
         "",
     ]
@@ -219,7 +225,7 @@ def write_package_manifest(
         [
             "## 下一步人工任务",
             "",
-            "1. 将 `paper/04_submission_manuscript_candidate.md` 转为 Word 正式稿并人工改写。",
+            "1. 以 `paper/04_submission_manuscript_candidate.docx` 为 Word 初稿并人工改写。",
             "2. 按学校/赛区模板填写 AI 工具使用情况表、承诺书和报名表。",
             "3. 做查重并控制在官方要求范围内。",
             "4. 核对参考文献元数据和数据源引用。",
@@ -229,6 +235,17 @@ def write_package_manifest(
     )
     manifest.write_text("\n".join(lines), encoding="utf-8")
     return manifest
+
+
+def write_submission_docx(package_dir: Path) -> Path | None:
+    """Generate a DOCX draft inside the package when the Markdown candidate exists."""
+    markdown_path = package_dir / SUBMISSION_MARKDOWN_IN_PACKAGE
+    if not markdown_path.exists():
+        return None
+    docx_path = package_dir / SUBMISSION_DOCX_IN_PACKAGE
+    export_markdown_to_docx(markdown_path, docx_path)
+    validate_docx_package(docx_path)
+    return docx_path
 
 
 def zip_directory(package_dir: Path) -> Path:
@@ -264,6 +281,7 @@ def prepare_submission_package(
             missing.append(asset)
 
     write_data_notice(package_dir, include_derived_data=include_derived_data)
+    write_submission_docx(package_dir)
     write_package_manifest(package_dir, copied, missing, include_derived_data=include_derived_data)
 
     missing_required = [asset for asset in missing if asset.required]

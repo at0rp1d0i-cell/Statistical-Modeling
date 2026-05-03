@@ -12,13 +12,14 @@
 | AI 工具使用情况表 | 待用户/队伍填写 | 官方通知列为参赛材料；AI 使用规范要求披露并保留必要材料 | 根据实际使用 Codex/Claude/LLM 情况如实填写 |
 | 承诺书 | 待用户/队伍填写 | 官方通知列为参赛材料 | 使用大赛附件模板 |
 | 报名表 | 待用户/队伍填写 | 官方通知列为参赛材料 | 使用大赛附件模板 |
-| 论文 | 投稿候选稿完成 | `docs/paper/04_submission_manuscript_candidate.md` | 转 Word/排版/压缩字数/人工改写 |
+| 论文 | 投稿候选稿完成 | `docs/paper/04_submission_manuscript_candidate.md`；本地 DOCX 可由 `src/33_export_submission_docx.py` 生成 | 排版/压缩字数/人工改写 |
 | 数据包 | 部分就绪 | `data/raw/`, `data/interim/`, `outputs/` | 整理可公开提交版本，剔除不应提交的原始授权数据 |
 | 代码包 | 基本就绪 | `src/`, `tests/`, `README.md`, `environment.yml` | 最终重跑并写运行说明 |
 
 ## 2. 论文定稿任务
 
 - [ ] 将 `docs/paper/04_submission_manuscript_candidate.md` 转成 Word 正式稿，并由参赛队人工审阅、改写和确认正文表述。
+- [x] 生成本地 Word 初稿：`python3 src/33_export_submission_docx.py`。
 - [ ] 统一标题、摘要、关键词、一级/二级标题格式。
 - [ ] 将正文表图编号与 `docs/paper/table-figure-inventory.md` 对齐。
 - [ ] 决定 Table 5 / Figure 4 / Table 13 是否全部放入技术附录。
@@ -52,6 +53,7 @@
 - [ ] 准备 `data/processed/` 或最小可复现输入表，避免提交过大的中间文件。
 - [ ] 补充数据来源说明：PKU 指数、CMCC、控制变量来源。
 - [x] 使用 `python3 src/32_prepare_submission_package.py` 生成本地提交包；默认不复制 `data/raw/`。
+- [x] 本地提交包自动包含 `paper/04_submission_manuscript_candidate.docx`。
 - [ ] 若确认派生数据可提交，再使用 `python3 src/32_prepare_submission_package.py --include-derived-data` 生成含派生数据版本。
 - [ ] 运行完整测试：`python3 -m pytest -q`。
 - [ ] 运行语法检查：`python3 -m py_compile $(find src tests -name '*.py' | sort)`。
@@ -78,7 +80,7 @@
 
 ## 6. 当前最短冲刺路径
 
-1. 先把 `04_submission_manuscript_candidate.md` 转成 Word 初稿，并进行人工改写确认。
+1. 先打开 `dist/04_submission_manuscript_candidate.docx` 或提交包内 `paper/04_submission_manuscript_candidate.docx`，进行人工改写确认。
 2. 按 Table/Figure inventory 插入正文表图占位。
 3. 统一参考文献格式。
 4. 做一次最终重跑和测试。
