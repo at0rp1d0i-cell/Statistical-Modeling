@@ -14,6 +14,7 @@ DEFAULT_DML_TABLE = TABLES_DIR / "table_02_dml_main_and_robustness.csv"
 DEFAULT_TWFE_TABLE = TABLES_DIR / "table_06_ols_twfe_candidate.csv"
 DEFAULT_PLACEBO_SUMMARY = TABLES_DIR / "table_07_dml_placebo_candidate_summary.csv"
 DEFAULT_LEARNER_TABLE = TABLES_DIR / "table_08_dml_learner_replacement_candidate.csv"
+DEFAULT_POPULATION_SENSITIVITY_TABLE = TABLES_DIR / "table_11_population_sensitivity_robustness.csv"
 DEFAULT_CATE_SUMMARY = INTERIM_DATA_DIR / "modeling" / "heterogeneity_candidate_cate_summary.csv"
 DEFAULT_HETEROGENEITY_GROUP_TABLE = TABLES_DIR / "table_10_heterogeneity_group_summary.csv"
 DEFAULT_POLICY_TABLE = TABLES_DIR / "table_05_policy_seed_mechanism_candidate.csv"
@@ -27,6 +28,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--twfe-table-path", type=Path, default=DEFAULT_TWFE_TABLE)
     parser.add_argument("--placebo-summary-path", type=Path, default=DEFAULT_PLACEBO_SUMMARY)
     parser.add_argument("--learner-table-path", type=Path, default=DEFAULT_LEARNER_TABLE)
+    parser.add_argument("--population-sensitivity-table-path", type=Path, default=DEFAULT_POPULATION_SENSITIVITY_TABLE)
     parser.add_argument("--cate-summary-path", type=Path, default=DEFAULT_CATE_SUMMARY)
     parser.add_argument("--heterogeneity-group-table-path", type=Path, default=DEFAULT_HETEROGENEITY_GROUP_TABLE)
     parser.add_argument("--policy-table-path", type=Path, default=DEFAULT_POLICY_TABLE)
@@ -58,6 +60,7 @@ def build_evidence_synthesis(
     twfe: pd.DataFrame,
     placebo: pd.DataFrame,
     learner: pd.DataFrame,
+    population_sensitivity: pd.DataFrame | None,
     cate: pd.DataFrame,
     heterogeneity_group: pd.DataFrame | None,
     policy: pd.DataFrame,
@@ -71,6 +74,12 @@ def build_evidence_synthesis(
         source_paths["placebo"],
     )
     require_columns(learner, ["learner_label", "ate", "p_value"], source_paths["learner"])
+    if population_sensitivity is not None and not population_sensitivity.empty:
+        require_columns(
+            population_sensitivity,
+            ["spec_key", "ate", "ci_lower", "ci_upper", "p_value", "ate_delta_vs_baseline"],
+            source_paths["population_sensitivity"],
+        )
     require_columns(cate, ["cate_mean", "cate_median"], source_paths["cate"])
     require_columns(policy, ["variable_name", "nobs"], source_paths["policy"])
     if heterogeneity_group is not None and not heterogeneity_group.empty:
@@ -87,6 +96,29 @@ def build_evidence_synthesis(
     placebo_row = placebo.iloc[0]
     learner_ates = learner["ate"].astype(float)
     learner_p = learner["p_value"].astype(float)
+    if population_sensitivity is not None and not population_sensitivity.empty:
+        population_row = find_row(
+            population_sensitivity,
+            "spec_key",
+            "population_augmented",
+            source_paths["population_sensitivity"],
+        )
+        population_source = "Table 11"
+        population_core = (
+            f"加入人口ATE={fmt(population_row['ate'])}, "
+            f"95%CI=[{fmt(population_row['ci_lower'])}, {fmt(population_row['ci_upper'])}], "
+            f"p={fmt(population_row['p_value'])}, Δ={fmt(population_row['ate_delta_vs_baseline'])}"
+        )
+        population_direction = "负向但不显著" if float(population_row["p_value"]) >= 0.05 else "负向显著"
+        population_support = "提示口径敏感" if float(population_row["p_value"]) >= 0.05 else "支持"
+        population_boundary = "人口变量仅作敏感性控制；加入后效应收缩，主结论需保留口径敏感性说明。"
+    else:
+        population_source = "未读取"
+        population_core = "人口敏感性表未生成"
+        population_direction = "缺失"
+        population_support = "待补"
+        population_boundary = "需运行 src/28_export_population_sensitivity.py。"
+
     cate_row = cate.iloc[0]
     if heterogeneity_group is not None and not heterogeneity_group.empty:
         group_work = heterogeneity_group.copy()
@@ -172,6 +204,16 @@ def build_evidence_synthesis(
         },
         {
             "序号": 7,
+            "证据环节": "人口变量敏感性",
+            "来源": population_source,
+            "核心数值": population_core,
+            "方向": population_direction,
+            "论文用途": "正文稳健性边界",
+            "对主命题支持": population_support,
+            "边界说明": population_boundary,
+        },
+        {
+            "序号": 8,
             "证据环节": "正式异质性分组",
             "来源": heterogeneity_source,
             "核心数值": heterogeneity_core,
@@ -181,7 +223,7 @@ def build_evidence_synthesis(
             "边界说明": heterogeneity_boundary,
         },
         {
-            "序号": 8,
+            "序号": 9,
             "证据环节": "政策文本机制",
             "来源": "Table 5 / Figure 4",
             "核心数值": f"seed候选变量数={policy['variable_name'].nunique()}, 回归样本量={int(policy['nobs'].max())}",
@@ -213,6 +255,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "twfe": args.twfe_table_path,
         "placebo": args.placebo_summary_path,
         "learner": args.learner_table_path,
+        "population_sensitivity": args.population_sensitivity_table_path,
         "cate": args.cate_summary_path,
         "heterogeneity_group": args.heterogeneity_group_table_path,
         "policy": args.policy_table_path,
@@ -222,6 +265,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         twfe=pd.read_csv(args.twfe_table_path),
         placebo=pd.read_csv(args.placebo_summary_path),
         learner=pd.read_csv(args.learner_table_path),
+        population_sensitivity=(
+            pd.read_csv(args.population_sensitivity_table_path)
+            if args.population_sensitivity_table_path.exists()
+            else None
+        ),
         cate=pd.read_csv(args.cate_summary_path),
         heterogeneity_group=pd.read_csv(args.heterogeneity_group_table_path) if args.heterogeneity_group_table_path.exists() else None,
         policy=pd.read_csv(args.policy_table_path),

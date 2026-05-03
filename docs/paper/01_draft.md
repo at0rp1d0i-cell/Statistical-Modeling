@@ -121,7 +121,7 @@
 5. 异质性主线已从“CATE 技术预检查”推进到“区域 + 经济发展水平 + 产业结构”三类正式分组摘要，并导出 `Table 10` / `Figure 6`。
 6. 政策文本模块在正文中保留为方法创新，当前 seed rule-proxy 结果暂放附录或技术说明。
 
-当前项目已经具备论文初稿继续扩写的核心证据链：描述统计、DML 主结果、替换结果变量、OLS TWFE 对照、安慰剂检验、学习器替换、正式异质性分组、政策文本机制接口。下一步重点不再是等待数据，而是补人口稳健性、完善异质性差异解释、扩展政策文本 validated LLM scoring，并将现有结果整合为完整正文。
+当前项目已经具备论文初稿继续扩写的核心证据链：描述统计、DML 主结果、替换结果变量、OLS TWFE 对照、安慰剂检验、学习器替换、人口变量敏感性、正式异质性分组、政策文本机制接口。下一步重点不再是等待数据，而是解释人口敏感性结果、完善异质性差异检验、扩展政策文本 validated LLM scoring，并将现有结果整合为完整正文。
 
 ## 五、当前写作边界
 
@@ -147,8 +147,8 @@
 在不新增数据源的情况下，以下工作仍然可以继续开展：
 
 1. 主回归结果的进一步表格化、文字化解释与图示整理
-2. 稳健性结果的进一步扩展和对比呈现
-3. 围绕区域、经济发展水平和产业结构输出正式异质性分组表图
+2. 稳健性结果的进一步扩展和对比呈现，尤其是人口敏感性带来的效应收缩
+3. 围绕区域、经济发展水平和产业结构继续补充分组差异解释
 4. 政策文本 seed 机制变量的技术性回归结果解释与附录边界说明
 5. 论文摘要、研究设计、变量说明和阶段性结果章节的持续补写
 
@@ -233,6 +233,15 @@
 已补充 DML 残差置换安慰剂检验 `Table 7` 和 `Figure 5`。当前版本对主结果变量 `co2_emission_intensity` 进行 `500` 次 residual-permutation placebo：真实 ATE 为 `-0.0541`，placebo 分布均值为 `0.0009`，标准差为 `0.0183`，2.5% 与 97.5% 分位数分别为 `-0.0351` 和 `0.0359`，经验 p-value 为 `0.0040`。这说明当前真实估计值位于随机置换分布尾部，支持主结果并非由随机处理变量排列产生。
 
 解释边界：该安慰剂检验是当前稳健性证据；若后续调整人口稳健性、样本补源或 DML 规格，需同步重跑。
+
+
+已补充人口变量敏感性稳健性检验 `Table 11`。该表在 DML 主结果变量 `co2_emission_intensity` 下对比“不含人口变量”的主规格与“加入 `population_control_candidate`”的敏感性规格。当前结果为：
+
+- 主规格：ATE = `-0.0541`，95% CI = `[-0.0952, -0.0130]`，p-value = `0.0098`；
+- 加入人口变量后：ATE = `-0.0180`，95% CI = `[-0.0613, 0.0254]`，p-value = `0.4172`；
+- 相对主规格变化：`0.0361`。
+
+解释边界：人口变量加入后估计方向仍为负，但效应绝对值明显收缩且不显著。这并不改变“人口变量不进主回归”的设计决定，反而说明人口口径对结果有明显敏感性。论文写作应将 `Table 11` 放在稳健性边界中，谨慎表述为“主规格结果较明确，但人口口径敏感性提示结论需要保留控制变量口径边界”。
 
 已补充 DML 学习器替换候选稳健性检验 `Table 8`。在保持相同样本、处理变量、结果变量、控制变量、城市分组交叉拟合和城市聚类标准误的条件下，替换 nuisance model 后的结果为：
 
@@ -335,7 +344,7 @@
 
 稳健性结果同样对应 `Table 2` 和 `Figure 2`。将结果变量替换为 `co2_emission_total` 后，ATE 为 `-129.93`，95% 置信区间为 `[-224.18, -35.67]`，p-value 为 `0.0069`。当前可以写作：总量口径下的估计方向与强度口径一致，说明基准结论并非仅依赖碳排放强度定义。
 
-但本部分还不是完整稳健性章节。当前已补充 OLS 双向固定效应候选对照 `Table 6`：强度口径系数为 `-0.0668`，95% CI = `[-0.1068, -0.0267]`，p-value = `0.0011`；总量口径系数为 `48.3482`，95% CI = `[-6.8023, 103.4988]`，p-value = `0.0858`。这意味着 OLS TWFE 在强度口径上支持主方向，但在总量口径上没有复制 DML 的负向显著结果。当前还补充了 DML 残差置换安慰剂检验 `Table 7` 和 `Figure 5`：500 次 placebo 的经验 p-value 为 `0.0040`，真实 ATE 位于随机置换分布尾部。`Table 8` 显示，替换为 RandomForest 和 ExtraTrees 后，主结果 ATE 仍为负且在 5% 水平附近显著，说明方向具有一定稳定性。后续仍需人口变量敏感性和变量口径审查。
+但本部分还不是完整稳健性章节。当前已补充 OLS 双向固定效应候选对照 `Table 6`：强度口径系数为 `-0.0668`，95% CI = `[-0.1068, -0.0267]`，p-value = `0.0011`；总量口径系数为 `48.3482`，95% CI = `[-6.8023, 103.4988]`，p-value = `0.0858`。这意味着 OLS TWFE 在强度口径上支持主方向，但在总量口径上没有复制 DML 的负向显著结果。当前还补充了 DML 残差置换安慰剂检验 `Table 7` 和 `Figure 5`：500 次 placebo 的经验 p-value 为 `0.0040`，真实 ATE 位于随机置换分布尾部。`Table 8` 显示，替换为 RandomForest 和 ExtraTrees 后，主结果 ATE 仍为负且在 5% 水平附近显著，说明方向具有一定稳定性。`Table 11` 显示，加入人口变量后 ATE 仍为负但收缩为 `-0.0180` 且不显著，提示人口口径对估计有明显敏感性。后续仍需变量口径审查。
 
 ### 13.4 正式异质性分组分析
 
@@ -356,6 +365,7 @@
 ```bash
 python3 src/03_eda.py
 python3 src/06_robustness.py
+python3 src/28_export_population_sensitivity.py
 python3 src/25_export_result_figures.py
 python3 src/27_export_heterogeneity_groups.py
 ```
@@ -381,4 +391,6 @@ python3 src/27_export_heterogeneity_groups.py
 - `outputs/tables/table_10_heterogeneity_group_summary.csv`
 - `outputs/tables/table_10_heterogeneity_group_summary.tex`
 - `outputs/figures/figure_06_heterogeneity_groups.pdf`
+- `outputs/tables/table_11_population_sensitivity_robustness.csv`
+- `outputs/tables/table_11_population_sensitivity_robustness.tex`
 - `outputs/figures/figure_manifest.csv`

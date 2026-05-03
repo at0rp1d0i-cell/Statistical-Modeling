@@ -22,6 +22,7 @@
 | Table 8 | `outputs/tables/table_08_dml_learner_replacement_candidate.csv` / `.tex` | `src/06_robustness.py` | 候选完成 | DML nuisance 学习器替换检验；当前方向稳定，最终规格锁定后需重跑 |
 | Table 9 | `outputs/tables/table_09_current_evidence_synthesis.csv` / `.tex` | `src/26_export_evidence_synthesis.py` | 写作汇总完成 | 当前结论证据链汇总；不是新增模型结果，用于论文叙述和答辩沟通 |
 | Table 10 | `outputs/tables/table_10_heterogeneity_group_summary.csv` / `.tex` | `src/27_export_heterogeneity_groups.py` | 首轮完成 | 区域、经济发展水平、产业结构三类正式异质性分组摘要；基于当前 CATE 候选估计，近似区间不等同于严格 subgroup significance test |
+| Table 11 | `outputs/tables/table_11_population_sensitivity_robustness.csv` / `.tex` | `src/28_export_population_sensitivity.py` | 首轮完成 | 人口变量敏感性稳健性；人口不进入主规格，加入后 ATE 收缩且不显著，正文需作为口径敏感性边界说明 |
 
 ## 图形
 
@@ -38,5 +39,5 @@
 ## 下一批表图缺口
 
 1. validated LLM 政策文本评分图/表（需先完成完整语料与校验）。
-2. 人口变量稳健性/敏感性表。
-3. 最终定稿前随人口稳健性、最终规格说明重跑 Table 1、Table 6、Table 7、Table 8、Table 9 和 Table 10。
+2. 异质性组间差异检验或 bootstrap 差异表。
+3. 最终定稿前随最终规格说明重跑 Table 1、Table 6、Table 7、Table 8、Table 9、Table 10 和 Table 11。

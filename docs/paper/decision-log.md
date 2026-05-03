@@ -295,3 +295,22 @@
 - 主回归表述统一为“不含人口变量”的主规格；人口变量只可在稳健性段落出现。
 - 异质性章节应从 CATE 技术预检查转向三类正式分组结果。
 - 政策文本模块可作为创新点写入正文方法，但当前 Table 5 / Figure 4 应归入附录或技术附录。
+
+### 17. 人口变量敏感性稳健性已补充
+
+- 已新增 `src/28_export_population_sensitivity.py`，导出：
+  - `outputs/tables/table_11_population_sensitivity_robustness.csv`
+  - `outputs/tables/table_11_population_sensitivity_robustness.tex`
+- 设定：在 DML 主结果变量 `co2_emission_intensity` 下，对比：
+  - 主规格：`gdp_total + secondary_industry_share + fiscal_expenditure`
+  - 人口敏感性规格：主规格控制集 + `population_control_candidate`
+- 当前结果：
+  - 主规格 ATE = `-0.0541`，95% CI = `[-0.0952, -0.0130]`，p-value = `0.0098`
+  - 加入人口后 ATE = `-0.0180`，95% CI = `[-0.0613, 0.0254]`，p-value = `0.4172`
+  - 相对主规格变化 = `0.0361`
+
+说明：
+
+- 人口变量加入后估计方向仍为负，但效应绝对值明显收缩且不显著
+- 这支持“人口变量不进主回归，只作为稳健性/敏感性”的设计决定
+- 论文写作必须保留口径敏感性说明，不能只报告主规格显著结果而忽略 Table 11

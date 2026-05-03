@@ -9,6 +9,7 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
     twfe_table = tmp_path / "table_06.csv"
     placebo_table = tmp_path / "table_07.csv"
     learner_table = tmp_path / "table_08.csv"
+    population_table = tmp_path / "table_11.csv"
     cate_summary = tmp_path / "cate_summary.csv"
     heterogeneity_group_table = tmp_path / "table_10.csv"
     policy_table = tmp_path / "table_05.csv"
@@ -52,6 +53,16 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
     ).to_csv(learner_table, index=False)
     pd.DataFrame(
         {
+            "spec_key": ["baseline_no_population", "population_augmented"],
+            "ate": [-0.05, -0.02],
+            "ci_lower": [-0.08, -0.06],
+            "ci_upper": [-0.01, 0.02],
+            "p_value": [0.01, 0.40],
+            "ate_delta_vs_baseline": [0.0, 0.03],
+        }
+    ).to_csv(population_table, index=False)
+    pd.DataFrame(
+        {
             "nobs": [100],
             "cate_mean": [-0.05],
             "cate_median": [-0.03],
@@ -86,6 +97,8 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
             str(placebo_table),
             "--learner-table-path",
             str(learner_table),
+            "--population-sensitivity-table-path",
+            str(population_table),
             "--cate-summary-path",
             str(cate_summary),
             "--heterogeneity-group-table-path",
@@ -107,9 +120,10 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
     assert output_csv.exists()
     assert output_tex.exists()
     exported = pd.read_csv(output_csv)
-    assert len(exported) == 8
+    assert len(exported) == 9
     assert "DML主结果" in exported["证据环节"].tolist()
     assert "政策文本机制" in exported["证据环节"].tolist()
     assert "正式异质性分组" in exported["证据环节"].tolist()
+    assert "人口变量敏感性" in exported["证据环节"].tolist()
     assert exported.loc[exported["证据环节"] == "政策文本机制", "论文用途"].iloc[0] == "技术附录"
     assert exported.loc[exported["证据环节"] == "正式异质性分组", "来源"].iloc[0] == "Table 10 / Figure 6"
