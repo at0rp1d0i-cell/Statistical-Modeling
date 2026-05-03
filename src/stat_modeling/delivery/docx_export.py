@@ -281,6 +281,7 @@ def export_markdown_to_docx(
     output_path: Path,
     title: str | None = None,
     append_tables: list[DocxTable] | None = None,
+    append_figures: list[DocxFigure] | None = None,
 ) -> Path:
     """Export a Markdown file to a simple Word ``.docx`` file."""
     markdown_text = markdown_path.read_text(encoding="utf-8")
@@ -294,7 +295,7 @@ def export_markdown_to_docx(
         archive.writestr("_rels/.rels", package_relationships_xml())
         archive.writestr("docProps/core.xml", core_xml(inferred_title))
         archive.writestr("docProps/app.xml", app_xml())
-        archive.writestr("word/document.xml", build_document_xml_with_tables(blocks, append_tables))
+        archive.writestr("word/document.xml", build_document_xml_with_appendices(blocks, append_tables, append_figures))
         archive.writestr("word/styles.xml", styles_xml())
         archive.writestr("word/settings.xml", settings_xml())
     return output_path
@@ -310,6 +311,7 @@ def validate_docx_package(docx_path: Path) -> None:
     if missing:
         raise ValueError(f"DOCX package missing required members: {missing}")
 
+
 @dataclass(frozen=True)
 class DocxTable:
     """A simple table appendix to render into the generated DOCX."""
@@ -317,6 +319,18 @@ class DocxTable:
     title: str
     rows: tuple[tuple[str, ...], ...]
     note: str = ""
+
+
+@dataclass(frozen=True)
+class DocxFigure:
+    """A figure insertion record to render into the generated DOCX."""
+
+    figure_id: str
+    filename: str
+    caption_cn: str
+    caption_en: str = ""
+    caveat: str = ""
+    source: str = ""
 
 
 def _table_cell_xml(text: str, bold: bool = False) -> str:
@@ -370,9 +384,31 @@ def _appendix_xml(tables: list[DocxTable]) -> str:
     return "".join(parts)
 
 
-def build_document_xml_with_tables(blocks: list[MarkdownBlock], tables: list[DocxTable] | None = None) -> str:
+def _figure_appendix_xml(figures: list[DocxFigure]) -> str:
+    if not figures:
+        return ""
+    parts = [_paragraph_xml(MarkdownBlock("heading", "附录：图件清单（供排版插入正文）", 1))]
+    for figure in figures:
+        title = f"{figure.figure_id} {figure.caption_cn}".strip()
+        parts.append(_paragraph_xml(MarkdownBlock("heading", title, 2)))
+        parts.append(_paragraph_xml(MarkdownBlock("paragraph", f"文件：outputs/figures/{figure.filename}")))
+        if figure.caption_en:
+            parts.append(_paragraph_xml(MarkdownBlock("paragraph", f"English caption: {figure.caption_en}")))
+        if figure.caveat:
+            parts.append(_paragraph_xml(MarkdownBlock("quote", f"使用边界：{figure.caveat}")))
+        if figure.source:
+            parts.append(_paragraph_xml(MarkdownBlock("paragraph", f"来源：{figure.source}")))
+    return "".join(parts)
+
+
+def build_document_xml_with_appendices(
+    blocks: list[MarkdownBlock],
+    tables: list[DocxTable] | None = None,
+    figures: list[DocxFigure] | None = None,
+) -> str:
     body = "".join(_paragraph_xml(block) for block in blocks)
     body += _appendix_xml(tables or [])
+    body += _figure_appendix_xml(figures or [])
     return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
   <w:body>
@@ -384,3 +420,8 @@ def build_document_xml_with_tables(blocks: list[MarkdownBlock], tables: list[Doc
   </w:body>
 </w:document>
 '''
+
+
+def build_document_xml_with_tables(blocks: list[MarkdownBlock], tables: list[DocxTable] | None = None) -> str:
+    """Backward-compatible wrapper for table-only appendix rendering."""
+    return build_document_xml_with_appendices(blocks, tables=tables)

@@ -4,6 +4,7 @@ import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from stat_modeling.delivery.docx_export import DocxFigure
 from stat_modeling.delivery.docx_export import DocxTable
 from stat_modeling.delivery.docx_export import export_markdown_to_docx
 from stat_modeling.delivery.docx_export import parse_markdown_blocks
@@ -63,3 +64,28 @@ def test_export_markdown_to_docx_can_append_tables(tmp_path):
     assert "变量" in document_xml
     assert "1.23" in document_xml
     assert "<w:tbl>" in document_xml
+
+
+def test_export_markdown_to_docx_can_append_figure_list(tmp_path):
+    markdown = tmp_path / "paper.md"
+    output = tmp_path / "paper.docx"
+    markdown.write_text("# 主标题\n\n正文。\n", encoding="utf-8")
+    figure = DocxFigure(
+        figure_id="Figure 1",
+        filename="figure_01.pdf",
+        caption_cn="趋势图",
+        caption_en="Trend figure",
+        caveat="Descriptive only.",
+        source="outputs/tables/table_01.csv",
+    )
+
+    export_markdown_to_docx(markdown, output, append_figures=[figure])
+    validate_docx_package(output)
+
+    with zipfile.ZipFile(output) as archive:
+        document_xml = archive.read("word/document.xml").decode("utf-8")
+
+    assert "附录：图件清单" in document_xml
+    assert "Figure 1 趋势图" in document_xml
+    assert "outputs/figures/figure_01.pdf" in document_xml
+    assert "Descriptive only." in document_xml

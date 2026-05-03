@@ -191,7 +191,7 @@ def write_package_manifest(
         "",
         "## 内容结构",
         "",
-        "- `paper/`：论文 Markdown 初稿、Word 初稿、参考文献、提交清单和表图清单。",
+        "- `paper/`：论文 Markdown 初稿、带表格和图件清单附录的 Word 初稿、参考文献、提交清单和表图清单。",
         "- `outputs/tables/`：论文表格 CSV 与 LaTeX。",
         "- `outputs/figures/`：论文图件 PDF 与 figure manifest。",
         "- `code/`：复现代码、测试与环境说明。",
@@ -210,7 +210,7 @@ def write_package_manifest(
         "",
         f"- 已复制资产数：{len(copied)}",
         f"- 缺失资产数：{len(missing)}",
-        f"- Word 初稿：{'已生成' if docx_generated else '未生成'}",
+        f"- Word 初稿：{'已生成（含表格和图件清单附录）' if docx_generated else '未生成'}",
         f"- 包含派生数据：{'是' if include_derived_data else '否'}",
         "",
     ]
@@ -224,7 +224,7 @@ def write_package_manifest(
         [
             "## 下一步人工任务",
             "",
-            "1. 以 `paper/04_submission_manuscript_candidate.docx` 为 Word 初稿并人工改写。",
+            "1. 以 `paper/04_submission_manuscript_candidate.docx` 为 Word 初稿并人工改写、移动表格和插入图件。",
             "2. 按学校/赛区模板填写 AI 工具使用情况表、承诺书和报名表。",
             "3. 做查重并控制在官方要求范围内。",
             "4. 核对参考文献元数据和数据源引用。",
@@ -242,7 +242,12 @@ def write_submission_docx(package_dir: Path) -> Path | None:
     if not markdown_path.exists():
         return None
     docx_path = package_dir / SUBMISSION_DOCX_IN_PACKAGE
-    export_submission_docx(markdown_path, docx_path, tables_dir=package_dir / "outputs" / "tables")
+    export_submission_docx(
+        markdown_path,
+        docx_path,
+        tables_dir=package_dir / "outputs" / "tables",
+        figures_dir=package_dir / "outputs" / "figures",
+    )
     return docx_path
 
 
