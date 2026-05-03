@@ -47,6 +47,26 @@ python3 src/08_policy_text.py --help
 7. `src/07_spatial.py` (optional)
 8. `src/08_policy_text.py` (mechanism/moderation support lane)
 
+Current project-specific continuation scripts:
+
+9. `src/09_cmcc_prepare.py`
+10. `src/10_build_pku_cmcc_candidate_panel.py`
+11. `src/11_extract_core_controls.py`
+12. `src/12_build_modeling_candidate_panel.py`
+13. `src/13_prepare_dml_candidate_input.py`
+14. `src/14_export_table_02.py`
+15. `src/15_export_table_03.py`
+16. `src/16_export_table_04.py`
+17. `src/17_prepare_policy_mechanism_template.py`
+18. `src/18_prepare_policy_text_bootstrap.py`
+19. `src/19_seed_policy_registry.py`
+20. `src/20_score_policy_seeds.py`
+21. `src/21_merge_policy_seed_panel.py`
+22. `src/22_build_modeling_policy_seed_panel.py`
+23. `src/23_mechanism_seed_regression.py`
+24. `src/24_export_table_05.py`
+25. `src/25_export_result_figures.py`
+
 ## Policy-text corpus lane
 
 Use the policy-text scaffold to prepare the corpus workspace and record the expected pipeline stage:
@@ -85,6 +105,16 @@ Current first-pass mainline:
 - covariance: `cluster(pku_city_code)`
 
 Current first-pass robustness result uses `co2_emission_total` as the outcome under the same control set.
+
+## Reporting assets
+
+First-pass figure assets can be regenerated with:
+
+```bash
+python3 src/25_export_result_figures.py
+```
+
+This writes PDF figures and a manifest under `outputs/figures/`. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs remain ignored by git unless explicitly force-added as final competition artifacts.
 
 ## Heterogeneity runtime note
 
