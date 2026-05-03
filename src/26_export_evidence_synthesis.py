@@ -15,6 +15,7 @@ DEFAULT_TWFE_TABLE = TABLES_DIR / "table_06_ols_twfe_candidate.csv"
 DEFAULT_PLACEBO_SUMMARY = TABLES_DIR / "table_07_dml_placebo_candidate_summary.csv"
 DEFAULT_LEARNER_TABLE = TABLES_DIR / "table_08_dml_learner_replacement_candidate.csv"
 DEFAULT_CATE_SUMMARY = INTERIM_DATA_DIR / "modeling" / "heterogeneity_candidate_cate_summary.csv"
+DEFAULT_HETEROGENEITY_GROUP_TABLE = TABLES_DIR / "table_10_heterogeneity_group_summary.csv"
 DEFAULT_POLICY_TABLE = TABLES_DIR / "table_05_policy_seed_mechanism_candidate.csv"
 DEFAULT_OUTPUT_CSV = TABLES_DIR / "table_09_current_evidence_synthesis.csv"
 DEFAULT_OUTPUT_TEX = TABLES_DIR / "table_09_current_evidence_synthesis.tex"
@@ -27,6 +28,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--placebo-summary-path", type=Path, default=DEFAULT_PLACEBO_SUMMARY)
     parser.add_argument("--learner-table-path", type=Path, default=DEFAULT_LEARNER_TABLE)
     parser.add_argument("--cate-summary-path", type=Path, default=DEFAULT_CATE_SUMMARY)
+    parser.add_argument("--heterogeneity-group-table-path", type=Path, default=DEFAULT_HETEROGENEITY_GROUP_TABLE)
     parser.add_argument("--policy-table-path", type=Path, default=DEFAULT_POLICY_TABLE)
     parser.add_argument("--output-csv-path", type=Path, default=DEFAULT_OUTPUT_CSV)
     parser.add_argument("--output-tex-path", type=Path, default=DEFAULT_OUTPUT_TEX)
@@ -57,6 +59,7 @@ def build_evidence_synthesis(
     placebo: pd.DataFrame,
     learner: pd.DataFrame,
     cate: pd.DataFrame,
+    heterogeneity_group: pd.DataFrame | None,
     policy: pd.DataFrame,
     source_paths: dict[str, Path],
 ) -> pd.DataFrame:
@@ -70,6 +73,12 @@ def build_evidence_synthesis(
     require_columns(learner, ["learner_label", "ate", "p_value"], source_paths["learner"])
     require_columns(cate, ["cate_mean", "cate_median"], source_paths["cate"])
     require_columns(policy, ["variable_name", "nobs"], source_paths["policy"])
+    if heterogeneity_group is not None and not heterogeneity_group.empty:
+        require_columns(
+            heterogeneity_group,
+            ["dimension_cn", "group_cn", "cate_mean", "n_city"],
+            source_paths["heterogeneity_group"],
+        )
 
     main_dml = find_row(dml, "outcome_column", "co2_emission_intensity", source_paths["dml"])
     total_dml = find_row(dml, "outcome_column", "co2_emission_total", source_paths["dml"])
@@ -79,6 +88,26 @@ def build_evidence_synthesis(
     learner_ates = learner["ate"].astype(float)
     learner_p = learner["p_value"].astype(float)
     cate_row = cate.iloc[0]
+    if heterogeneity_group is not None and not heterogeneity_group.empty:
+        group_work = heterogeneity_group.copy()
+        group_work["cate_mean"] = group_work["cate_mean"].astype(float)
+        strongest_group = group_work.loc[group_work["cate_mean"].idxmin()]
+        heterogeneity_source = "Table 10 / Figure 6"
+        heterogeneity_core = (
+            f"分组数={len(group_work)}, 最负组={strongest_group['dimension_cn']}-{strongest_group['group_cn']}, "
+            f"CATE均值={fmt(strongest_group['cate_mean'])}"
+        )
+        heterogeneity_direction = "分组差异存在"
+        heterogeneity_use = "正文异质性"
+        heterogeneity_support = "提供异质性线索"
+        heterogeneity_boundary = "基于当前CATE候选估计的分组摘要；近似区间不等同严格subgroup significance test。"
+    else:
+        heterogeneity_source = "Table 3 / Figure 3"
+        heterogeneity_core = f"CATE均值={fmt(cate_row['cate_mean'])}, CATE中位数={fmt(cate_row['cate_median'])}"
+        heterogeneity_direction = "总体负向"
+        heterogeneity_use = "候选结果"
+        heterogeneity_support = "方向一致"
+        heterogeneity_boundary = "CATE技术预检查；正式分组表未读取。"
 
     rows = [
         {
@@ -89,7 +118,7 @@ def build_evidence_synthesis(
             "方向": "负向显著",
             "论文用途": "正文主结果",
             "对主命题支持": "支持",
-            "边界说明": "当前候选样本与方案B控制集。",
+            "边界说明": "当前2019—2023样本与方案B控制集。",
         },
         {
             "序号": 2,
@@ -143,13 +172,13 @@ def build_evidence_synthesis(
         },
         {
             "序号": 7,
-            "证据环节": "候选异质性",
-            "来源": "Table 3 / Figure 3",
-            "核心数值": f"CATE均值={fmt(cate_row['cate_mean'])}, CATE中位数={fmt(cate_row['cate_median'])}",
-            "方向": "总体负向",
-            "论文用途": "候选结果",
-            "对主命题支持": "方向一致",
-            "边界说明": "headline异质性维度尚未锁定。",
+            "证据环节": "正式异质性分组",
+            "来源": heterogeneity_source,
+            "核心数值": heterogeneity_core,
+            "方向": heterogeneity_direction,
+            "论文用途": heterogeneity_use,
+            "对主命题支持": heterogeneity_support,
+            "边界说明": heterogeneity_boundary,
         },
         {
             "序号": 8,
@@ -170,7 +199,7 @@ def format_latex_table(table: pd.DataFrame) -> str:
     return display.to_latex(
         index=False,
         escape=False,
-        caption="当前结论证据链汇总（候选样本）",
+        caption="当前结论证据链汇总（2019—2023 当前样本）",
         label="tab:current_evidence_synthesis",
     )
 
@@ -185,6 +214,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "placebo": args.placebo_summary_path,
         "learner": args.learner_table_path,
         "cate": args.cate_summary_path,
+        "heterogeneity_group": args.heterogeneity_group_table_path,
         "policy": args.policy_table_path,
     }
     table = build_evidence_synthesis(
@@ -193,6 +223,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         placebo=pd.read_csv(args.placebo_summary_path),
         learner=pd.read_csv(args.learner_table_path),
         cate=pd.read_csv(args.cate_summary_path),
+        heterogeneity_group=pd.read_csv(args.heterogeneity_group_table_path) if args.heterogeneity_group_table_path.exists() else None,
         policy=pd.read_csv(args.policy_table_path),
         source_paths=source_paths,
     )

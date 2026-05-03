@@ -4,7 +4,9 @@
 
 This repository contains the implementation workflow for the 2026 statistical modeling competition topic:
 
-"Dual-carbon strategy and the carbon reduction effect of digital economy: causal inference and heterogeneity analysis based on double machine learning."
+"Carbon reduction effect of digital inclusive finance under the dual-carbon strategy: causal inference and policy-text mechanism analysis based on double machine learning with Chinese prefecture-level city panel data."
+
+Current Chinese working title: “双碳”战略下数字普惠金融的碳减排效应：基于中国地级市面板的双重机器学习因果推断与政策文本机制分析.
 
 The project uses a `B-lite` structure:
 
@@ -66,6 +68,8 @@ Current project-specific continuation scripts:
 23. `src/23_mechanism_seed_regression.py`
 24. `src/24_export_table_05.py`
 25. `src/25_export_result_figures.py`
+26. `src/26_export_evidence_synthesis.py`
+27. `src/27_export_heterogeneity_groups.py`
 
 ## Policy-text corpus lane
 
@@ -104,7 +108,7 @@ Current first-pass mainline:
 - cross-fitting: `GroupKFold(pku_city_code)`
 - covariance: `cluster(pku_city_code)`
 
-Current first-pass robustness result uses `co2_emission_total` as the outcome under the same control set.
+Current first-pass robustness result uses `co2_emission_total` as the outcome under the same control set. The population candidate variable is not part of the main regression and is reserved for robustness/sensitivity checks.
 
 ## Reporting assets
 
@@ -114,21 +118,23 @@ The current paper-writing entrypoints are:
 - `docs/paper/02_manuscript_v0_1.md` — continuous v0.1 manuscript draft for expansion
 - `docs/paper/table-figure-inventory.md` — table, figure, and manuscript asset inventory
 
-Current candidate-sample descriptive and robustness tables can be regenerated with:
+Current sample descriptive, robustness, evidence-synthesis, and heterogeneity tables can be regenerated with:
 
 ```bash
 python3 src/03_eda.py
 python3 src/06_robustness.py
 python3 src/26_export_evidence_synthesis.py
+python3 src/27_export_heterogeneity_groups.py
 ```
 
 First-pass figure assets can be regenerated with:
 
 ```bash
 python3 src/25_export_result_figures.py
+python3 src/27_export_heterogeneity_groups.py
 ```
 
-These commands write paper-facing tables under `outputs/tables/` and PDF figures plus a manifest under `outputs/figures/`. `src/06_robustness.py` currently exports the OLS TWFE candidate benchmark, the DML residual-permutation placebo check, and the DML learner-replacement robustness table. `src/26_export_evidence_synthesis.py` exports the current evidence-chain synthesis table for writing and presentation. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs remain ignored by git unless explicitly force-added as final competition artifacts.
+These commands write paper-facing tables under `outputs/tables/` and PDF figures plus a manifest under `outputs/figures/`. `src/06_robustness.py` currently exports the OLS TWFE candidate benchmark, the DML residual-permutation placebo check, and the DML learner-replacement robustness table. `src/26_export_evidence_synthesis.py` exports the current evidence-chain synthesis table for writing and presentation. `src/27_export_heterogeneity_groups.py` exports Table 10 and Figure 6 for the confirmed region / economic-development / industrial-structure heterogeneity dimensions. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs remain ignored by git unless explicitly force-added as final competition artifacts.
 
 ## Heterogeneity runtime note
 

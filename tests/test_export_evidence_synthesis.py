@@ -10,6 +10,7 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
     placebo_table = tmp_path / "table_07.csv"
     learner_table = tmp_path / "table_08.csv"
     cate_summary = tmp_path / "cate_summary.csv"
+    heterogeneity_group_table = tmp_path / "table_10.csv"
     policy_table = tmp_path / "table_05.csv"
     output_csv = tmp_path / "table_09.csv"
     output_tex = tmp_path / "table_09.tex"
@@ -58,6 +59,14 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
     ).to_csv(cate_summary, index=False)
     pd.DataFrame(
         {
+            "dimension_cn": ["区域", "区域"],
+            "group_cn": ["东部", "西部"],
+            "cate_mean": [-0.03, -0.07],
+            "n_city": [50, 50],
+        }
+    ).to_csv(heterogeneity_group_table, index=False)
+    pd.DataFrame(
+        {
             "variable_name": ["policy_strength"],
             "coefficient": [1.0],
             "p_value": [0.01],
@@ -79,6 +88,8 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
             str(learner_table),
             "--cate-summary-path",
             str(cate_summary),
+            "--heterogeneity-group-table-path",
+            str(heterogeneity_group_table),
             "--policy-table-path",
             str(policy_table),
             "--output-csv-path",
@@ -99,4 +110,6 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
     assert len(exported) == 8
     assert "DML主结果" in exported["证据环节"].tolist()
     assert "政策文本机制" in exported["证据环节"].tolist()
+    assert "正式异质性分组" in exported["证据环节"].tolist()
     assert exported.loc[exported["证据环节"] == "政策文本机制", "论文用途"].iloc[0] == "技术附录"
+    assert exported.loc[exported["证据环节"] == "正式异质性分组", "来源"].iloc[0] == "Table 10 / Figure 6"
