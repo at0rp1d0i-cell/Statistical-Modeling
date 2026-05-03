@@ -3,19 +3,35 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Sequence
 
+import matplotlib
+
+matplotlib.use("Agg")
+
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+import statsmodels.api as sm
 import statsmodels.formula.api as smf
 
+from stat_modeling.config import FIGURES_DIR
 from stat_modeling.config import INTERIM_DATA_DIR
+from stat_modeling.config import RANDOM_SEED
 from stat_modeling.config import TABLES_DIR
 from stat_modeling.config import ensure_project_directories
 from stat_modeling.data.io import read_table
 from stat_modeling.data.io import write_table
+from stat_modeling.modeling.dml import DMLResult
+from stat_modeling.modeling.dml import fit_partial_linear_dml
+from stat_modeling.modeling.dml import residualize_partial_linear_dml
 
 
 DEFAULT_INPUT_PATH = INTERIM_DATA_DIR / "modeling" / "dml_candidate_input_2019_2023.csv"
 DEFAULT_OUTPUT_CSV = TABLES_DIR / "table_06_ols_twfe_candidate.csv"
 DEFAULT_OUTPUT_TEX = TABLES_DIR / "table_06_ols_twfe_candidate.tex"
+DEFAULT_PLACEBO_SUMMARY_CSV = TABLES_DIR / "table_07_dml_placebo_candidate_summary.csv"
+DEFAULT_PLACEBO_SUMMARY_TEX = TABLES_DIR / "table_07_dml_placebo_candidate_summary.tex"
+DEFAULT_PLACEBO_DISTRIBUTION_CSV = TABLES_DIR / "table_07_dml_placebo_candidate_distribution.csv"
+DEFAULT_PLACEBO_FIGURE = FIGURES_DIR / "figure_05_dml_placebo_distribution.pdf"
 DEFAULT_TREATMENT = "digital_inclusive_finance_index"
 DEFAULT_OUTCOMES = "co2_emission_intensity,co2_emission_total"
 DEFAULT_CONTROLS = "gdp_total,secondary_industry_share,fiscal_expenditure"
@@ -71,19 +87,72 @@ class TwfeResult:
         }
 
 
+@dataclass(frozen=True)
+class PlaceboSummary:
+    outcome_column: str
+    treatment_column: str
+    true_ate: float
+    placebo_mean: float
+    placebo_std: float
+    placebo_q025: float
+    placebo_median: float
+    placebo_q975: float
+    empirical_p_value: float
+    permutations: int
+    nobs: int
+    folds: int
+    split_strategy: str
+    covariance_type: str
+    control_columns: list[str]
+
+    def to_row(self) -> dict[str, object]:
+        return {
+            "model": "DML_residual_permutation_placebo_candidate",
+            "outcome_column": self.outcome_column,
+            "outcome_label_cn": OUTCOME_LABELS_CN.get(self.outcome_column, self.outcome_column),
+            "outcome_label_en": OUTCOME_LABELS_EN.get(self.outcome_column, self.outcome_column),
+            "treatment_column": self.treatment_column,
+            "true_ate": self.true_ate,
+            "placebo_mean": self.placebo_mean,
+            "placebo_std": self.placebo_std,
+            "placebo_q025": self.placebo_q025,
+            "placebo_median": self.placebo_median,
+            "placebo_q975": self.placebo_q975,
+            "empirical_p_value": self.empirical_p_value,
+            "permutations": self.permutations,
+            "nobs": self.nobs,
+            "folds": self.folds,
+            "split_strategy": self.split_strategy,
+            "covariance_type": self.covariance_type,
+            "control_columns": ", ".join(self.control_columns),
+            "caveat": (
+                "Candidate residual-permutation placebo only; final robustness should rerun after "
+                "sample and specification lock."
+            ),
+        }
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Export candidate OLS two-way fixed effects robustness results."
+        description="Export candidate OLS TWFE and DML placebo robustness results."
     )
     parser.add_argument("--input-path", type=Path, default=DEFAULT_INPUT_PATH)
     parser.add_argument("--output-csv-path", type=Path, default=DEFAULT_OUTPUT_CSV)
     parser.add_argument("--output-tex-path", type=Path, default=DEFAULT_OUTPUT_TEX)
+    parser.add_argument("--placebo-summary-csv-path", type=Path, default=DEFAULT_PLACEBO_SUMMARY_CSV)
+    parser.add_argument("--placebo-summary-tex-path", type=Path, default=DEFAULT_PLACEBO_SUMMARY_TEX)
+    parser.add_argument("--placebo-distribution-csv-path", type=Path, default=DEFAULT_PLACEBO_DISTRIBUTION_CSV)
+    parser.add_argument("--placebo-figure-path", type=Path, default=DEFAULT_PLACEBO_FIGURE)
     parser.add_argument("--treatment-column", default=DEFAULT_TREATMENT)
     parser.add_argument("--outcome-columns", default=DEFAULT_OUTCOMES)
+    parser.add_argument("--placebo-outcome-column", default="co2_emission_intensity")
     parser.add_argument("--control-columns", default=DEFAULT_CONTROLS)
     parser.add_argument("--entity-column", default="pku_city_code")
     parser.add_argument("--time-column", default="year")
     parser.add_argument("--cluster-column", default="pku_city_code")
+    parser.add_argument("--folds", type=int, default=5)
+    parser.add_argument("--placebo-permutations", type=int, default=500)
+    parser.add_argument("--random-seed", type=int, default=RANDOM_SEED)
     return parser
 
 
@@ -226,6 +295,170 @@ def export_ols_twfe_table(table: pd.DataFrame, output_csv_path: Path, output_tex
     return {"csv_path": csv_path, "tex_path": output_tex_path}
 
 
+def run_dml_residual_placebo(
+    frame: pd.DataFrame,
+    outcome_column: str,
+    treatment_column: str,
+    control_columns: list[str],
+    group_column: str,
+    cluster_column: str,
+    folds: int,
+    permutations: int,
+    random_seed: int,
+) -> tuple[DMLResult, PlaceboSummary, pd.DataFrame]:
+    if permutations <= 0:
+        raise ValueError("placebo_permutations must be positive")
+    true_result = fit_partial_linear_dml(
+        frame=frame,
+        outcome_column=outcome_column,
+        treatment_column=treatment_column,
+        control_columns=control_columns,
+        folds=folds,
+        random_seed=random_seed,
+        group_column=group_column,
+        cluster_column=cluster_column,
+    )
+    residuals = residualize_partial_linear_dml(
+        frame=frame,
+        outcome_column=outcome_column,
+        treatment_column=treatment_column,
+        control_columns=control_columns,
+        folds=folds,
+        random_seed=random_seed,
+        group_column=group_column,
+        cluster_column=cluster_column,
+    )
+    clusters = residuals.model_frame[cluster_column].to_numpy()
+    rng = np.random.default_rng(random_seed)
+    rows: list[dict[str, object]] = []
+    for iteration in range(1, permutations + 1):
+        placebo_t = rng.permutation(residuals.t_res)
+        fitted = sm.OLS(residuals.y_res, sm.add_constant(placebo_t)).fit(
+            cov_type="cluster",
+            cov_kwds={"groups": clusters},
+        )
+        rows.append(
+            {
+                "iteration": iteration,
+                "placebo_ate": float(fitted.params[1]),
+                "placebo_std_error": float(fitted.bse[1]),
+                "placebo_p_value": float(fitted.pvalues[1]),
+            }
+        )
+    distribution = pd.DataFrame(rows)
+    abs_true = abs(true_result.ate)
+    extreme_count = int((distribution["placebo_ate"].abs() >= abs_true).sum())
+    empirical_p_value = (extreme_count + 1) / (permutations + 1)
+    summary = PlaceboSummary(
+        outcome_column=outcome_column,
+        treatment_column=treatment_column,
+        true_ate=true_result.ate,
+        placebo_mean=float(distribution["placebo_ate"].mean()),
+        placebo_std=float(distribution["placebo_ate"].std()),
+        placebo_q025=float(distribution["placebo_ate"].quantile(0.025)),
+        placebo_median=float(distribution["placebo_ate"].quantile(0.5)),
+        placebo_q975=float(distribution["placebo_ate"].quantile(0.975)),
+        empirical_p_value=float(empirical_p_value),
+        permutations=permutations,
+        nobs=true_result.nobs,
+        folds=true_result.folds,
+        split_strategy=true_result.split_strategy,
+        covariance_type=true_result.covariance_type,
+        control_columns=control_columns,
+    )
+    distribution["true_ate"] = true_result.ate
+    distribution["outcome_column"] = outcome_column
+    distribution["treatment_column"] = treatment_column
+    return true_result, summary, distribution
+
+
+def format_placebo_summary_latex(summary_table: pd.DataFrame) -> str:
+    display = summary_table[
+        [
+            "outcome_label_cn",
+            "true_ate",
+            "placebo_mean",
+            "placebo_std",
+            "placebo_q025",
+            "placebo_q975",
+            "empirical_p_value",
+            "permutations",
+            "nobs",
+        ]
+    ].copy()
+    display.columns = [
+        "结果变量",
+        "真实ATE",
+        "Placebo均值",
+        "Placebo标准差",
+        "Placebo 2.5%",
+        "Placebo 97.5%",
+        "经验P值",
+        "置换次数",
+        "样本量",
+    ]
+    for column in ["真实ATE", "Placebo均值", "Placebo标准差", "Placebo 2.5%", "Placebo 97.5%", "经验P值"]:
+        display[column] = display[column].map(lambda value: f"{value:.4f}")
+    for column in ["置换次数", "样本量"]:
+        display[column] = display[column].astype(int).astype(str)
+    return display.to_latex(
+        index=False,
+        escape=False,
+        caption="DML 残差置换安慰剂检验候选结果",
+        label="tab:dml_placebo_candidate",
+    )
+
+
+def save_placebo_figure(distribution: pd.DataFrame, summary: PlaceboSummary, output_path: Path) -> Path:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig, ax = plt.subplots(figsize=(7.2, 4.2))
+    ax.hist(distribution["placebo_ate"], bins=30, color="#9e9e9e", edgecolor="white")
+    ax.axvline(summary.true_ate, color="#2f5597", linestyle="-", linewidth=1.8, label=f"True ATE = {summary.true_ate:.4f}")
+    ax.axvline(-abs(summary.true_ate), color="#2f5597", linestyle=":", linewidth=1.2, label="|True ATE| thresholds")
+    ax.axvline(abs(summary.true_ate), color="#2f5597", linestyle=":", linewidth=1.2)
+    ax.axvline(0, color="#444444", linestyle="--", linewidth=1)
+    ax.set_title("DML residual-permutation placebo distribution")
+    ax.set_xlabel("Placebo ATE")
+    ax.set_ylabel("Frequency")
+    ax.text(
+        0.98,
+        0.95,
+        f"Permutation p = {summary.empirical_p_value:.4f}\nN = {summary.permutations}",
+        transform=ax.transAxes,
+        ha="right",
+        va="top",
+        fontsize=9,
+        bbox={"boxstyle": "round,pad=0.25", "facecolor": "white", "edgecolor": "#dddddd", "alpha": 0.9},
+    )
+    ax.legend(frameon=False, loc="upper left")
+    fig.tight_layout()
+    fig.savefig(output_path, format="pdf", bbox_inches="tight")
+    plt.close(fig)
+    return output_path
+
+
+def export_placebo_outputs(
+    summary: PlaceboSummary,
+    distribution: pd.DataFrame,
+    summary_csv_path: Path,
+    summary_tex_path: Path,
+    distribution_csv_path: Path,
+    figure_path: Path,
+) -> dict[str, Path]:
+    summary_table = pd.DataFrame([summary.to_row()])
+    summary_csv = write_table(summary_table, summary_csv_path)
+    summary_tex_path.parent.mkdir(parents=True, exist_ok=True)
+    summary_tex_path.write_text(format_placebo_summary_latex(summary_table), encoding="utf-8")
+    distribution_csv = write_table(distribution, distribution_csv_path)
+    figure = save_placebo_figure(distribution, summary, figure_path)
+    return {
+        "summary_csv_path": summary_csv,
+        "summary_tex_path": summary_tex_path,
+        "distribution_csv_path": distribution_csv,
+        "figure_path": figure,
+    }
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -247,6 +480,30 @@ def main(argv: Sequence[str] | None = None) -> int:
     print(f"CSV table written to: {outputs['csv_path']}")
     print(f"LaTeX table written to: {outputs['tex_path']}")
     print("Boundary note: OLS TWFE is a candidate robustness comparison and does not replace DML.")
+    _, placebo_summary, placebo_distribution = run_dml_residual_placebo(
+        frame=frame,
+        outcome_column=args.placebo_outcome_column,
+        treatment_column=args.treatment_column,
+        control_columns=control_columns,
+        group_column=args.entity_column,
+        cluster_column=args.cluster_column,
+        folds=args.folds,
+        permutations=args.placebo_permutations,
+        random_seed=args.random_seed,
+    )
+    placebo_outputs = export_placebo_outputs(
+        summary=placebo_summary,
+        distribution=placebo_distribution,
+        summary_csv_path=args.placebo_summary_csv_path,
+        summary_tex_path=args.placebo_summary_tex_path,
+        distribution_csv_path=args.placebo_distribution_csv_path,
+        figure_path=args.placebo_figure_path,
+    )
+    print(f"Placebo summary CSV written to: {placebo_outputs['summary_csv_path']}")
+    print(f"Placebo summary LaTeX written to: {placebo_outputs['summary_tex_path']}")
+    print(f"Placebo distribution written to: {placebo_outputs['distribution_csv_path']}")
+    print(f"Placebo figure written to: {placebo_outputs['figure_path']}")
+    print("Boundary note: placebo output is candidate evidence until final sample/specification lock.")
     return 0
 
 

@@ -144,6 +144,8 @@ D = m(X) + V, \quad E[V|X] = 0.
 
 进一步地，`Table 6` 报告 OLS 双向固定效应候选对照结果。该模型加入城市固定效应和年份固定效应，并使用城市聚类标准误。结果显示，在碳排放强度口径下，数字普惠金融指数系数为 -0.0668，95% 置信区间为 [-0.1068, -0.0267]，p-value 为 0.0011，方向与 DML 主结果一致；但在碳排放总量口径下，系数为 48.3482，95% 置信区间为 [-6.8023, 103.4988]，p-value 为 0.0858，未复制 DML 总量稳健性中的负向显著结果。该差异提示，OLS TWFE 更适合作为传统线性基准参照，而不能替代 DML 主识别。后续需要继续通过安慰剂检验、学习器替换和变量口径审查评估结论稳健性。
 
+`Table 7` 和 `Figure 5` 进一步报告 DML 残差置换安慰剂检验。本文在主结果变量碳排放强度口径下，对残差化后的处理变量进行 500 次随机置换，并重新估计 placebo ATE 分布。结果显示，真实 ATE 为 -0.0541，而 placebo 分布均值为 0.0009，标准差为 0.0183，2.5% 与 97.5% 分位数分别为 -0.0351 和 0.0359；基于双侧极端值计算的经验 p-value 为 0.0040。该结果表明，当前真实估计值位于随机置换分布尾部，从安慰剂检验角度支持基准 DML 结果并非由随机处理变量排列产生。需要说明的是，该检验仍属于候选稳健性证据，最终样本和规格锁定后需重跑。
+
 ### 6.4 候选异质性分析
 
 `Table 3`、`Table 4` 和 `Figure 3` 展示当前候选异质性结果。当前 CATE 均值为 -0.0516，中位数为 -0.0323，方向与基准 DML 的平均效应一致。这说明在当前技术实现下，因果森林估计的城市层面边际效应总体支持数字普惠金融降低碳排放强度的方向。
@@ -164,7 +166,7 @@ D = m(X) + V, \quad E[V|X] = 0.
 
 ## 8 局限性与后续工作
 
-本文当前仍存在若干限制。第一，当前样本仍是候选样本，最终是否补齐个别缺失城市、是否采用平衡面板以及是否调整样本窗口仍需确认。第二，人口规模变量存在跨年口径风险，目前未进入主规格，后续需要决定是否作为敏感性控制变量加入。第三，稳健性检验仍不完整，虽然已经补充 OLS 双向固定效应候选对照，但仍需补充安慰剂检验、学习器替换和变量替换等检验。第四，当前异质性结果仍是技术预检查，缺少最终理论分组和 headline 异质性解释。第五，政策文本机制仍处于 seed rule-proxy 阶段，尚不能代表完整 LLM 政策文本分析结果。
+本文当前仍存在若干限制。第一，当前样本仍是候选样本，最终是否补齐个别缺失城市、是否采用平衡面板以及是否调整样本窗口仍需确认。第二，人口规模变量存在跨年口径风险，目前未进入主规格，后续需要决定是否作为敏感性控制变量加入。第三，稳健性检验仍不完整，虽然已经补充 OLS 双向固定效应候选对照和 DML 残差置换安慰剂检验，但仍需补充学习器替换和变量替换等检验。第四，当前异质性结果仍是技术预检查，缺少最终理论分组和 headline 异质性解释。第五，政策文本机制仍处于 seed rule-proxy 阶段，尚不能代表完整 LLM 政策文本分析结果。
 
 后续工作将围绕四条线推进：一是锁定最终样本和变量口径；二是补充完整稳健性检验；三是确定正式异质性维度并输出分组结果；四是扩展政策文本语料并建立 validated LLM scoring 流程。完成上述工作后，本文可从 v0.1 技术初稿推进为可投稿或参赛定稿版本。
 
@@ -190,7 +192,9 @@ D = m(X) + V, \quad E[V|X] = 0.
 - `Table 4`: `outputs/tables/table_04_heterogeneity_candidate_city_extremes.csv` / `.tex`
 - `Table 5`: `outputs/tables/table_05_policy_seed_mechanism_candidate.csv` / `.tex`
 - `Table 6`: `outputs/tables/table_06_ols_twfe_candidate.csv` / `.tex`
+- `Table 7`: `outputs/tables/table_07_dml_placebo_candidate_summary.csv` / `.tex`
 - `Figure 1`: `outputs/figures/figure_01_digital_finance_carbon_intensity_trends.pdf`
 - `Figure 2`: `outputs/figures/figure_02_dml_effect_intervals.pdf`
 - `Figure 3`: `outputs/figures/figure_03_candidate_cate_distribution.pdf`
 - `Figure 4`: `outputs/figures/figure_04_policy_seed_mechanism_snapshot.pdf`
+- `Figure 5`: `outputs/figures/figure_05_dml_placebo_distribution.pdf`

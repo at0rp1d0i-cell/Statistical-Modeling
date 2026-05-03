@@ -205,6 +205,27 @@
 - `Table 2` 和 `Figure 2` 可以进入结果章节
 - `Table 5` 和 `Figure 4` 当前不建议进入正文主结果表图；应作为政策文本机制技术附录或模块说明，直到完成完整语料和 validated LLM scoring
 
+### 13. DML 残差置换安慰剂检验已补充
+
+- 已扩展 `src/06_robustness.py`，在 OLS TWFE 之外导出 DML placebo 候选稳健性结果
+- 已新增 DML residualization helper，支持复用交叉拟合残差进行 residual-permutation placebo
+- 已生成：
+  - `outputs/tables/table_07_dml_placebo_candidate_summary.csv`
+  - `outputs/tables/table_07_dml_placebo_candidate_summary.tex`
+  - `outputs/tables/table_07_dml_placebo_candidate_distribution.csv`
+  - `outputs/figures/figure_05_dml_placebo_distribution.pdf`
+- 当前候选结果：
+  - 真实 ATE = `-0.0541`
+  - placebo 均值 = `0.0009`
+  - placebo 标准差 = `0.0183`
+  - placebo 2.5% / 97.5% 分位数 = `[-0.0351, 0.0359]`
+  - 500 次置换经验 p-value = `0.0040`
+
+说明：
+
+- 当前真实 ATE 位于随机置换分布尾部，支持主结果不是由随机处理变量排列产生
+- 该结果仍是候选稳健性证据；最终样本、控制变量和 DML 规格锁定后需重跑
+
 ## 对写作的直接影响
 
 1. 摘要中可以直接写“已形成 2019—2023 年城市级 DML 候选样本”
@@ -216,3 +237,4 @@
 7. `02_manuscript_v0_1.md` 可以作为正式论文写作底稿继续扩写，但不能替代最终结果锁定流程
 8. OLS TWFE 对照已经可写入稳健性章节，但必须说明它是候选线性基准参照且总量口径与 DML 存在差异
 9. 当前政策文本 seed 表图只用于技术附录，不作为正文主结果或最终机制证据
+10. Placebo 检验可以写入稳健性章节，但需标注为 residual-permutation 候选检验

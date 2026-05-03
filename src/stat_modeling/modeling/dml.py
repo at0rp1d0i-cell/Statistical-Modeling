@@ -45,7 +45,18 @@ class DMLResult:
         )
 
 
-def fit_partial_linear_dml(
+@dataclass(slots=True)
+class DMLResiduals:
+    y_res: np.ndarray
+    t_res: np.ndarray
+    model_frame: pd.DataFrame
+    folds: int
+    split_strategy: str
+    nuisance_model_y: str
+    nuisance_model_t: str
+
+
+def residualize_partial_linear_dml(
     frame: pd.DataFrame,
     outcome_column: str,
     treatment_column: str,
@@ -54,7 +65,7 @@ def fit_partial_linear_dml(
     random_seed: int = 42,
     group_column: str | None = None,
     cluster_column: str | None = None,
-) -> DMLResult:
+) -> DMLResiduals:
     if not control_columns:
         raise ValueError("control_columns cannot be empty for partial linear DML")
 
@@ -71,7 +82,6 @@ def fit_partial_linear_dml(
     t = model_frame[treatment_column].to_numpy(dtype=float)
     x = model_frame[control_columns].to_numpy(dtype=float)
     groups = model_frame[group_column].to_numpy() if group_column else None
-    clusters = model_frame[cluster_column].to_numpy() if cluster_column else None
 
     model_y = GradientBoostingRegressor(random_state=random_seed)
     model_t = GradientBoostingRegressor(random_state=random_seed)
@@ -98,14 +108,47 @@ def fit_partial_linear_dml(
         y_res[test_idx] = y_test - fitted_y.predict(x_test)
         t_res[test_idx] = t_test - fitted_t.predict(x_test)
 
+    return DMLResiduals(
+        y_res=y_res,
+        t_res=t_res,
+        model_frame=model_frame,
+        folds=folds,
+        split_strategy=split_strategy,
+        nuisance_model_y=type(model_y).__name__,
+        nuisance_model_t=type(model_t).__name__,
+    )
+
+
+def fit_partial_linear_dml(
+    frame: pd.DataFrame,
+    outcome_column: str,
+    treatment_column: str,
+    control_columns: list[str],
+    folds: int = 5,
+    random_seed: int = 42,
+    group_column: str | None = None,
+    cluster_column: str | None = None,
+) -> DMLResult:
+    residuals = residualize_partial_linear_dml(
+        frame=frame,
+        outcome_column=outcome_column,
+        treatment_column=treatment_column,
+        control_columns=control_columns,
+        folds=folds,
+        random_seed=random_seed,
+        group_column=group_column,
+        cluster_column=cluster_column,
+    )
+    clusters = residuals.model_frame[cluster_column].to_numpy() if cluster_column else None
+
     if clusters is not None:
-        ols = sm.OLS(y_res, sm.add_constant(t_res)).fit(
+        ols = sm.OLS(residuals.y_res, sm.add_constant(residuals.t_res)).fit(
             cov_type="cluster",
             cov_kwds={"groups": clusters},
         )
         covariance_type = f"cluster({cluster_column})"
     else:
-        ols = sm.OLS(y_res, sm.add_constant(t_res)).fit(cov_type="HC3")
+        ols = sm.OLS(residuals.y_res, sm.add_constant(residuals.t_res)).fit(cov_type="HC3")
         covariance_type = "HC3"
     ate = float(ols.params[1])
     std_error = float(ols.bse[1])
@@ -117,10 +160,10 @@ def fit_partial_linear_dml(
         ci_lower=float(ci_low),
         ci_upper=float(ci_high),
         p_value=float(ols.pvalues[1]),
-        nobs=int(len(model_frame)),
-        folds=folds,
-        split_strategy=split_strategy,
+        nobs=int(len(residuals.model_frame)),
+        folds=residuals.folds,
+        split_strategy=residuals.split_strategy,
         covariance_type=covariance_type,
-        nuisance_model_y=type(model_y).__name__,
-        nuisance_model_t=type(model_t).__name__,
+        nuisance_model_y=residuals.nuisance_model_y,
+        nuisance_model_t=residuals.nuisance_model_t,
     )

@@ -207,6 +207,10 @@
 
 解释边界：OLS TWFE 是候选稳健性参照，不替代 DML 主识别。当前强度口径与 DML 主结果方向一致；总量口径在 TWFE 下未复制 DML 的负向显著结果，提示后续需要继续补充安慰剂检验、学习器替换和变量口径审查。
 
+已补充 DML 残差置换安慰剂检验 `Table 7` 和 `Figure 5`。当前版本对主结果变量 `co2_emission_intensity` 进行 `500` 次 residual-permutation placebo：真实 ATE 为 `-0.0541`，placebo 分布均值为 `0.0009`，标准差为 `0.0183`，2.5% 与 97.5% 分位数分别为 `-0.0351` 和 `0.0359`，经验 p-value 为 `0.0040`。这说明当前真实估计值位于随机置换分布尾部，支持主结果并非由随机处理变量排列产生。
+
+解释边界：该安慰剂检验是候选稳健性证据；最终样本、控制变量与 DML 规格锁定后需重跑。
+
 ## 十一、当前异质性技术运行状态（阶段性）
 
 在候选异质性特征集
@@ -281,7 +285,7 @@
 
 稳健性结果同样对应 `Table 2` 和 `Figure 2`。将结果变量替换为 `co2_emission_total` 后，ATE 为 `-129.93`，95% 置信区间为 `[-224.18, -35.67]`，p-value 为 `0.0069`。当前可以写作：总量口径下的估计方向与强度口径一致，说明基准结论并非仅依赖碳排放强度定义。
 
-但本部分还不是完整稳健性章节。当前已补充 OLS 双向固定效应候选对照 `Table 6`：强度口径系数为 `-0.0668`，95% CI = `[-0.1068, -0.0267]`，p-value = `0.0011`；总量口径系数为 `48.3482`，95% CI = `[-6.8023, 103.4988]`，p-value = `0.0858`。这意味着 OLS TWFE 在强度口径上支持主方向，但在总量口径上没有复制 DML 的负向显著结果，后续仍需补充安慰剂检验、学习器替换和变量口径审查。
+但本部分还不是完整稳健性章节。当前已补充 OLS 双向固定效应候选对照 `Table 6`：强度口径系数为 `-0.0668`，95% CI = `[-0.1068, -0.0267]`，p-value = `0.0011`；总量口径系数为 `48.3482`，95% CI = `[-6.8023, 103.4988]`，p-value = `0.0858`。这意味着 OLS TWFE 在强度口径上支持主方向，但在总量口径上没有复制 DML 的负向显著结果。当前还补充了 DML 残差置换安慰剂检验 `Table 7` 和 `Figure 5`：500 次 placebo 的经验 p-value 为 `0.0040`，真实 ATE 位于随机置换分布尾部。后续仍需补充学习器替换和变量口径审查。
 
 ### 13.4 候选异质性分析
 
@@ -311,8 +315,12 @@ python3 src/25_export_result_figures.py
 - `outputs/tables/table_01_descriptive_statistics.tex`
 - `outputs/tables/table_06_ols_twfe_candidate.csv`
 - `outputs/tables/table_06_ols_twfe_candidate.tex`
+- `outputs/tables/table_07_dml_placebo_candidate_summary.csv`
+- `outputs/tables/table_07_dml_placebo_candidate_summary.tex`
+- `outputs/tables/table_07_dml_placebo_candidate_distribution.csv`
 - `outputs/figures/figure_01_digital_finance_carbon_intensity_trends.pdf`
 - `outputs/figures/figure_02_dml_effect_intervals.pdf`
 - `outputs/figures/figure_03_candidate_cate_distribution.pdf`
 - `outputs/figures/figure_04_policy_seed_mechanism_snapshot.pdf`
+- `outputs/figures/figure_05_dml_placebo_distribution.pdf`
 - `outputs/figures/figure_manifest.csv`

@@ -18,6 +18,7 @@
 | Table 4 | `outputs/tables/table_04_heterogeneity_candidate_city_extremes.csv` / `.tex` | `src/16_export_table_04.py` | 候选完成 | 城市 CATE 极值展示，非最终 headline 异质性结论 |
 | Table 5 | `outputs/tables/table_05_policy_seed_mechanism_candidate.csv` / `.tex` | `src/23_mechanism_seed_regression.py`, `src/24_export_table_05.py` | seed 技术附录候选 | 只建议放在技术附录或机制模块说明中；不建议作为正文主结果表，不能写成最终 LLM 机制结论 |
 | Table 6 | `outputs/tables/table_06_ols_twfe_candidate.csv` / `.tex` | `src/06_robustness.py` | 候选完成 | OLS 城市与年份双向固定效应对照；用于稳健性参照，不替代 DML 主识别 |
+| Table 7 | `outputs/tables/table_07_dml_placebo_candidate_summary.csv` / `.tex` | `src/06_robustness.py` | 候选完成 | DML 残差置换安慰剂检验；最终样本/规格锁定后需重跑 |
 
 ## 图形
 
@@ -27,12 +28,12 @@
 | Figure 2 | `outputs/figures/figure_02_dml_effect_intervals.pdf` | `src/25_export_result_figures.py` | 首轮完成 | 展示当前 DML 主结果与总量稳健性估计区间 |
 | Figure 3 | `outputs/figures/figure_03_candidate_cate_distribution.pdf` | `src/25_export_result_figures.py` | 候选完成 | CATE 分布预检查，异质性解释变量仍待最终锁定 |
 | Figure 4 | `outputs/figures/figure_04_policy_seed_mechanism_snapshot.pdf` | `src/25_export_result_figures.py` | seed 技术附录候选 | seed 中央政策规则代理覆盖与分数快照；不进入正文主结果，非 validated LLM scoring |
+| Figure 5 | `outputs/figures/figure_05_dml_placebo_distribution.pdf` | `src/06_robustness.py` | 候选完成 | DML 残差置换安慰剂分布图；用于稳健性章节候选证据 |
 | Figure manifest | `outputs/figures/figure_manifest.csv` | `src/25_export_result_figures.py` | 已生成 | 记录图形 caption、来源与 caveat |
 
 ## 下一批表图缺口
 
-1. 安慰剂检验分布图。
-2. 学习器替换稳健性表。
-3. 正式异质性分组图（需先锁定 headline 分组）。
-4. validated LLM 政策文本评分图/表（需先完成完整语料与校验）。
-5. 最终定稿前随最终样本与规格重跑 Table 1 和 Table 6。
+1. 学习器替换稳健性表。
+2. 正式异质性分组图（需先锁定 headline 分组）。
+3. validated LLM 政策文本评分图/表（需先完成完整语料与校验）。
+4. 最终定稿前随最终样本与规格重跑 Table 1、Table 6 和 Table 7。

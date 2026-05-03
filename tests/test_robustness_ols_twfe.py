@@ -8,9 +8,13 @@ def test_robustness_exports_ols_twfe_candidate_table(tmp_path):
     input_path = tmp_path / "dml_candidate_input.csv"
     output_csv = tmp_path / "table_06.csv"
     output_tex = tmp_path / "table_06.tex"
+    placebo_summary_csv = tmp_path / "table_07_summary.csv"
+    placebo_summary_tex = tmp_path / "table_07_summary.tex"
+    placebo_distribution_csv = tmp_path / "table_07_distribution.csv"
+    placebo_figure = tmp_path / "figure_05.pdf"
 
     rows = []
-    for city_id, city_effect in [(1100, 0.2), (1200, -0.1), (1300, 0.05), (1400, -0.05), (1500, 0.1), (1600, -0.2)]:
+    for city_id, city_effect in [(1101, 0.2), (1202, -0.1), (1303, 0.05), (1404, -0.05), (1505, 0.1), (1606, -0.2)]:
         for year in [2019, 2020, 2021, 2022]:
             treatment = 10 + (city_id % 100) * 0.01 + (year - 2019)
             gdp = 100 + (city_id % 100) + 2 * (year - 2019)
@@ -40,6 +44,18 @@ def test_robustness_exports_ols_twfe_candidate_table(tmp_path):
             str(output_csv),
             "--output-tex-path",
             str(output_tex),
+            "--placebo-summary-csv-path",
+            str(placebo_summary_csv),
+            "--placebo-summary-tex-path",
+            str(placebo_summary_tex),
+            "--placebo-distribution-csv-path",
+            str(placebo_distribution_csv),
+            "--placebo-figure-path",
+            str(placebo_figure),
+            "--placebo-permutations",
+            "20",
+            "--folds",
+            "3",
         ],
         cwd=Path(__file__).resolve().parents[1],
         capture_output=True,
@@ -55,3 +71,12 @@ def test_robustness_exports_ols_twfe_candidate_table(tmp_path):
     assert set(exported["model"]) == {"OLS_TWFE_candidate"}
     assert exported["city_fixed_effects"].all()
     assert exported["year_fixed_effects"].all()
+    assert placebo_summary_csv.exists()
+    assert placebo_summary_tex.exists()
+    assert placebo_distribution_csv.exists()
+    assert placebo_figure.exists()
+    placebo_summary = pd.read_csv(placebo_summary_csv)
+    placebo_distribution = pd.read_csv(placebo_distribution_csv)
+    assert placebo_summary["permutations"].iloc[0] == 20
+    assert len(placebo_distribution) == 20
+    assert "empirical_p_value" in placebo_summary.columns
