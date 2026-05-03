@@ -119,7 +119,7 @@ python3 src/32_prepare_submission_package.py
 ```
 
 The command writes `dist/submission_package_current/` and `dist/submission_package_current.zip`.
-The bundle includes the manuscript Markdown draft, a generated DOCX draft, reference files, table/figure outputs,
+The bundle includes the manuscript Markdown draft, a generated DOCX draft with a table appendix, reference files, table/figure outputs,
 source code, tests, `README.md`, `environment.yml`, and a `DATA_NOTICE.md` explaining why raw data are excluded by default.
 
 To export only the Word draft without rebuilding the full package:
@@ -127,6 +127,8 @@ To export only the Word draft without rebuilding the full package:
 ```bash
 python3 src/33_export_submission_docx.py
 ```
+
+Use `--no-table-appendix` if you need a body-only DOCX. The default DOCX appends the current Table 1–13 CSV outputs at the end so they can be moved into the正文 during Word/WPS editing.
 
 Optional derived/interim modeling data can be copied with:
 

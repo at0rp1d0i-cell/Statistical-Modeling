@@ -276,7 +276,12 @@ def app_xml() -> str:
 '''
 
 
-def export_markdown_to_docx(markdown_path: Path, output_path: Path, title: str | None = None) -> Path:
+def export_markdown_to_docx(
+    markdown_path: Path,
+    output_path: Path,
+    title: str | None = None,
+    append_tables: list[DocxTable] | None = None,
+) -> Path:
     """Export a Markdown file to a simple Word ``.docx`` file."""
     markdown_text = markdown_path.read_text(encoding="utf-8")
     blocks = parse_markdown_blocks(markdown_text)
@@ -289,7 +294,7 @@ def export_markdown_to_docx(markdown_path: Path, output_path: Path, title: str |
         archive.writestr("_rels/.rels", package_relationships_xml())
         archive.writestr("docProps/core.xml", core_xml(inferred_title))
         archive.writestr("docProps/app.xml", app_xml())
-        archive.writestr("word/document.xml", build_document_xml(blocks))
+        archive.writestr("word/document.xml", build_document_xml_with_tables(blocks, append_tables))
         archive.writestr("word/styles.xml", styles_xml())
         archive.writestr("word/settings.xml", settings_xml())
     return output_path
@@ -304,3 +309,78 @@ def validate_docx_package(docx_path: Path) -> None:
     missing = sorted(REQUIRED_DOCX_MEMBERS - names)
     if missing:
         raise ValueError(f"DOCX package missing required members: {missing}")
+
+@dataclass(frozen=True)
+class DocxTable:
+    """A simple table appendix to render into the generated DOCX."""
+
+    title: str
+    rows: tuple[tuple[str, ...], ...]
+    note: str = ""
+
+
+def _table_cell_xml(text: str, bold: bool = False) -> str:
+    shade = '<w:shd w:fill="D9EAF7"/>' if bold else ""
+    return (
+        "<w:tc>"
+        f"<w:tcPr>{shade}<w:tcMar><w:top w:w=\"60\" w:type=\"dxa\"/><w:left w:w=\"60\" w:type=\"dxa\"/>"
+        '<w:bottom w:w="60" w:type="dxa"/><w:right w:w="60" w:type="dxa"/></w:tcMar></w:tcPr>'
+        "<w:p><w:pPr><w:spacing w:after=\"0\"/></w:pPr>"
+        f"{_run_xml(text, bold=bold, size_half_points=18)}"
+        "</w:p>"
+        "</w:tc>"
+    )
+
+
+def _table_xml(table: DocxTable) -> str:
+    if not table.rows:
+        return ""
+    rows_xml: list[str] = []
+    for row_index, row in enumerate(table.rows):
+        cells = "".join(_table_cell_xml(cell, bold=row_index == 0) for cell in row)
+        rows_xml.append(f"<w:tr>{cells}</w:tr>")
+    borders = (
+        '<w:tblBorders><w:top w:val="single" w:sz="6" w:space="0" w:color="808080"/>'
+        '<w:left w:val="single" w:sz="4" w:space="0" w:color="BFBFBF"/>'
+        '<w:bottom w:val="single" w:sz="6" w:space="0" w:color="808080"/>'
+        '<w:right w:val="single" w:sz="4" w:space="0" w:color="BFBFBF"/>'
+        '<w:insideH w:val="single" w:sz="4" w:space="0" w:color="BFBFBF"/>'
+        '<w:insideV w:val="single" w:sz="4" w:space="0" w:color="BFBFBF"/></w:tblBorders>'
+    )
+    return (
+        "<w:tbl>"
+        f"<w:tblPr><w:tblW w:w=\"0\" w:type=\"auto\"/>{borders}"
+        '<w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/>'
+        "</w:tblPr>"
+        f"{''.join(rows_xml)}"
+        "</w:tbl>"
+    )
+
+
+def _appendix_xml(tables: list[DocxTable]) -> str:
+    if not tables:
+        return ""
+    parts = [_paragraph_xml(MarkdownBlock("heading", "附录：论文表格（供排版插入正文）", 1))]
+    for table in tables:
+        parts.append(_paragraph_xml(MarkdownBlock("heading", table.title, 2)))
+        if table.note:
+            parts.append(_paragraph_xml(MarkdownBlock("quote", table.note)))
+        parts.append(_table_xml(table))
+        parts.append(_paragraph_xml(MarkdownBlock("paragraph", " ")))
+    return "".join(parts)
+
+
+def build_document_xml_with_tables(blocks: list[MarkdownBlock], tables: list[DocxTable] | None = None) -> str:
+    body = "".join(_paragraph_xml(block) for block in blocks)
+    body += _appendix_xml(tables or [])
+    return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    {body}
+    <w:sectPr>
+      <w:pgSz w:w="11906" w:h="16838"/>
+      <w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="720" w:footer="720" w:gutter="0"/>
+    </w:sectPr>
+  </w:body>
+</w:document>
+'''

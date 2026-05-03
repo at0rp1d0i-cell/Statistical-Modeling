@@ -17,8 +17,7 @@ from pathlib import Path
 from typing import Iterable, Sequence
 
 from stat_modeling.config import PROJECT_ROOT
-from stat_modeling.delivery.docx_export import export_markdown_to_docx
-from stat_modeling.delivery.docx_export import validate_docx_package
+from stat_modeling.delivery.submission_docx import export_submission_docx
 
 
 PAPER_DOC_FILES = (
@@ -243,8 +242,7 @@ def write_submission_docx(package_dir: Path) -> Path | None:
     if not markdown_path.exists():
         return None
     docx_path = package_dir / SUBMISSION_DOCX_IN_PACKAGE
-    export_markdown_to_docx(markdown_path, docx_path)
-    validate_docx_package(docx_path)
+    export_submission_docx(markdown_path, docx_path, tables_dir=package_dir / "outputs" / "tables")
     return docx_path
 
 

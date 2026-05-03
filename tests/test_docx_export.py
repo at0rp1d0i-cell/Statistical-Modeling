@@ -4,6 +4,7 @@ import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from stat_modeling.delivery.docx_export import DocxTable
 from stat_modeling.delivery.docx_export import export_markdown_to_docx
 from stat_modeling.delivery.docx_export import parse_markdown_blocks
 from stat_modeling.delivery.docx_export import validate_docx_package
@@ -39,3 +40,26 @@ def test_export_markdown_to_docx_creates_valid_package(tmp_path):
     assert "• 第一条" in document_xml
     assert "not exported" not in document_xml
     assert "&lt;xml&gt; &amp; 符号" in document_xml
+
+
+def test_export_markdown_to_docx_can_append_tables(tmp_path):
+    markdown = tmp_path / "paper.md"
+    output = tmp_path / "paper.docx"
+    markdown.write_text("# 主标题\n\n正文。\n", encoding="utf-8")
+    table = DocxTable(
+        title="Table 1 测试表",
+        rows=(("变量", "均值"), ("Y", "1.23")),
+        note="供排版插入正文。",
+    )
+
+    export_markdown_to_docx(markdown, output, append_tables=[table])
+    validate_docx_package(output)
+
+    with zipfile.ZipFile(output) as archive:
+        document_xml = archive.read("word/document.xml").decode("utf-8")
+
+    assert "附录：论文表格" in document_xml
+    assert "Table 1 测试表" in document_xml
+    assert "变量" in document_xml
+    assert "1.23" in document_xml
+    assert "<w:tbl>" in document_xml
