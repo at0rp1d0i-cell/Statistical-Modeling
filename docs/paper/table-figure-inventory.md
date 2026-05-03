@@ -24,6 +24,7 @@
 | Table 10 | `outputs/tables/table_10_heterogeneity_group_summary.csv` / `.tex` | `src/27_export_heterogeneity_groups.py` | 首轮完成 | 区域、经济发展水平、产业结构三类正式异质性分组摘要；基于当前 CATE 候选估计，近似区间不等同于严格 subgroup significance test |
 | Table 11 | `outputs/tables/table_11_population_sensitivity_robustness.csv` / `.tex` | `src/28_export_population_sensitivity.py` | 首轮完成 | 人口变量敏感性稳健性；人口不进入主规格，加入后 ATE 收缩且不显著，正文需作为口径敏感性边界说明 |
 | Table 12 | `outputs/tables/table_12_heterogeneity_group_differences.csv` / `.tex` | `src/29_export_heterogeneity_group_differences.py` | 首轮完成 | 城市层面 CATE 均值 bootstrap 组间差异诊断；用于增强异质性叙述，不等同重新估计分组 DML |
+| Table 13 | `outputs/tables/table_13_policy_llm_validation_readiness.csv` / `.tex` | `src/31_validate_policy_llm_scores.py` | 验证框架完成，当前 not_ready | 政策文本 LLM 评分验证就绪度；当前只记录评分准备与复核缺口，不作为正式机制证据 |
 
 ## 图形
 
@@ -39,6 +40,6 @@
 
 ## 下一批表图缺口
 
-1. validated LLM 政策文本评分图/表（需先完成完整语料与校验）。
+1. 实际 LLM 评分执行与抽样人工复核（需填充 `policy_llm_score_review_template_seed.csv` 或完整语料版本）。
 2. 异质性理论解释与政策含义段落。
-3. 最终定稿前随最终规格说明重跑 Table 1、Table 6、Table 7、Table 8、Table 9、Table 10、Table 11 和 Table 12。
+3. 最终定稿前随最终规格说明重跑 Table 1、Table 6、Table 7、Table 8、Table 9、Table 10、Table 11、Table 12 和 Table 13。

@@ -103,6 +103,7 @@
 - seed mechanism 字段已并回主建模候选面板
 - 首轮候选机制回归技术入口已跑通
 - `Table 5` 的候选机制回归 `.csv + .tex` 已导出
+- LLM 评分 payload、人工/LLM 复核模板与验证就绪度表已建立，`Table 13` 显示当前仍为 `not_ready`
 
 ### 5. 论文写作与决策追踪主线
 
@@ -122,7 +123,7 @@
 5. 异质性主线已从“CATE 技术预检查”推进到“区域 + 经济发展水平 + 产业结构”三类正式分组摘要，并导出 `Table 10` / `Figure 6` / `Table 12`。
 6. 政策文本模块在正文中保留为方法创新，当前 seed rule-proxy 结果暂放附录或技术说明。
 
-当前项目已经具备论文初稿继续扩写的核心证据链：描述统计、DML 主结果、替换结果变量、OLS TWFE 对照、安慰剂检验、学习器替换、人口变量敏感性、正式异质性分组与组间差异诊断、政策文本机制接口。下一步重点不再是等待数据，而是解释人口敏感性结果、扩展政策文本 validated LLM scoring，并将现有结果整合为完整正文。
+当前项目已经具备论文初稿继续扩写的核心证据链：描述统计、DML 主结果、替换结果变量、OLS TWFE 对照、安慰剂检验、学习器替换、人口变量敏感性、正式异质性分组与组间差异诊断、政策文本机制接口和 LLM 评分验证框架。下一步重点不再是等待数据，而是解释人口敏感性结果、实际执行并人工复核政策文本 LLM scoring，并将现有结果整合为完整正文。
 
 ## 五、当前写作边界
 
@@ -132,6 +133,7 @@
 - 当前 `2019-2023`、`294` 城、`1456` 个 city-year 样本已作为当前主分析样本接受；但仍需披露其候选来源、缺口城市和数据口径边界
 - `CMCC` 在本地数据中仍缺 `营口 / 三沙 / 儋州`
 - 当前政策文本分数仍以 `seed_rule_proxy` 为主，只能作为附录/技术候选机制变量，不能直接写成最终 validated LLM 机制证据
+- `Table 13` 当前为 `not_ready`，只说明 LLM 评分与人工复核流程已可执行，不说明政策文本机制已经验证完成
 
 ## 六、当前建议的主回归控制集
 
@@ -159,7 +161,7 @@
 
 1. `营口 / 三沙 / 儋州` 是否需要额外补源
 2. 政策文本是否从 seed 中央文档扩展到更完整的中央—省级—地级市语料
-3. validated LLM scoring 是否完成抽样人工校验与一致性记录
+3. validated LLM scoring 是否完成真实评分、抽样人工校验与一致性记录
 
 ## 八、下一步待补
 
@@ -184,7 +186,7 @@
 
 - 该文稿是 `v0.1 技术初稿`，不是最终定稿
 - 其中所有样本、主规格、异质性和政策机制表述均遵守当前研究设计边界：人口不进主回归，政策文本 seed 结果不进正文主结果
-- 后续人口稳健性、异质性差异检验和 validated LLM 政策文本评分完成后，需要同步改写该文稿
+- 后续人口敏感性解释、异质性理论解释和 validated LLM 政策文本评分完成后，需要同步改写该文稿
 
 ## 九、当前首轮主回归结果（阶段性）
 
@@ -312,10 +314,11 @@
 - 已将 seed mechanism 字段并回主建模候选面板
 - 已完成候选机制回归技术入口
 - 已导出政策文本 seed 机制候选结果 `Table 5`
+- 已导出 LLM 评分 payload、人工/LLM 复核模板与验证就绪度表 `Table 13`
 
 因此，政策文本机制链路当前的状态应表述为：
 
-> 已完成“真实入口 + seed 机制代理变量 + 可并表面板”的技术准备，但尚未完成完整政策语料与 validated LLM scoring，因此不能直接作为最终论文机制结论。
+> 已完成“真实入口 + seed 机制代理变量 + 可并表面板 + LLM 评分/复核模板”的技术准备，但尚未完成真实 LLM 评分、人工复核与完整政策语料，因此不能直接作为最终论文机制结论。
 
 当前 `Table 5` 的 seed 机制候选回归只用于验证政策文本机制变量可以进入模型链路。该表使用首批中央政策文档的规则代理分数，样本量为 `290`，三个候选机制变量的系数均为正且在当前技术规格下显著：
 
@@ -324,6 +327,8 @@
 - `mean_digital_green_synergy_city_year`: 系数 `26.1894`，95% CI = `[12.6742, 39.7047]`，p-value = `0.0001`
 
 需要特别强调：这些结果目前只能作为“政策文本机制分析的技术候选证据”。由于政策语料仍是 seed 中央文档，且评分方式仍为透明规则代理而非经过人工校验的 LLM 评分，不能据此直接写出最终机制结论，也不能把上述正系数解释为已验证的因果机制。
+
+当前 `Table 13` 用于记录 LLM 评分验证就绪度。seed 文档已生成 JSONL scoring payload 与人工/LLM 复核模板，但尚未填入真实 LLM 分数或人工复核结果，因此 readiness_status 为 `not_ready`，验证就绪行为 `0/3`。这使政策文本模块从“概念设计”推进到“可执行验证框架”，但仍不能替代正式机制证据。
 
 ## 十三、结果章节骨架（待扩写）
 
@@ -365,9 +370,9 @@
 
 ### 13.5 政策文本机制技术附录候选
 
-政策文本机制候选结果对应 `Table 5` 和 `Figure 4`。当前模块已经证明政策文本变量可以完成“文档登记—规则代理评分—city-year 聚合—并表—机制候选回归”的技术闭环。
+政策文本机制候选结果对应 `Table 5`、`Table 13` 和 `Figure 4`。当前模块已经证明政策文本变量可以完成“文档登记—规则代理评分—city-year 聚合—并表—机制候选回归”的技术闭环，并且已建立“LLM scoring payload—人工/LLM 复核模板—验证就绪度表”的可复现验证框架。
 
-正文处理建议：`Table 5` 和 `Figure 4` 暂不放入主结果章节作为正式机制发现；更适合放在“政策文本机制模块设计”或技术附录中，用来说明机制变量链路已经跑通。由于尚未完成完整中央—省级—地级市政策语料和 validated LLM scoring，不能将 `Table 5` 写成最终机制发现，也不能把 `Figure 4` 解释为政策趋势图。当前 `Figure 4` 已改为 seed 覆盖与分数快照，专门避免把稀疏 seed 文档误画成连续时间趋势。
+正文处理建议：`Table 5`、`Table 13` 和 `Figure 4` 暂不放入主结果章节作为正式机制发现；更适合放在“政策文本机制模块设计”或技术附录中，用来说明机制变量链路与 LLM 验证框架已经跑通。由于尚未完成完整中央—省级—地级市政策语料和真实 validated LLM scoring，不能将 `Table 5` 写成最终机制发现，也不能把 `Figure 4` 解释为政策趋势图。当前 `Figure 4` 已改为 seed 覆盖与分数快照，专门避免把稀疏 seed 文档误画成连续时间趋势。
 
 ### 13.6 当前表图资产
 
@@ -380,6 +385,8 @@ python3 src/28_export_population_sensitivity.py
 python3 src/25_export_result_figures.py
 python3 src/27_export_heterogeneity_groups.py
 python3 src/29_export_heterogeneity_group_differences.py
+python3 src/30_prepare_policy_llm_scoring_batch.py
+python3 src/31_validate_policy_llm_scores.py
 python3 src/26_export_evidence_synthesis.py
 ```
 
@@ -408,4 +415,6 @@ python3 src/26_export_evidence_synthesis.py
 - `outputs/tables/table_11_population_sensitivity_robustness.tex`
 - `outputs/tables/table_12_heterogeneity_group_differences.csv`
 - `outputs/tables/table_12_heterogeneity_group_differences.tex`
+- `outputs/tables/table_13_policy_llm_validation_readiness.csv`
+- `outputs/tables/table_13_policy_llm_validation_readiness.tex`
 - `outputs/figures/figure_manifest.csv`

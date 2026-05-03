@@ -331,3 +331,25 @@
 - `Table 12` 是城市层面 bootstrap 诊断，用于增强异质性叙述。
 - 它不等同于重新估计分组 DML，也不应写成“机制已被严格证明”。
 - 写作可表述为：当前异质性诊断显示，低经济发展水平城市以及西部、东北等区域的估计减排效应更强，提示数字普惠金融碳减排效应存在发展阶段和区域条件依赖性。
+
+### 19. 政策文本 LLM 评分验证框架已补充
+
+- 已新增 `src/30_prepare_policy_llm_scoring_batch.py`，导出：
+  - `data/interim/policy_text/policy_llm_scoring_batch_seed.jsonl`
+  - `data/interim/policy_text/policy_llm_score_review_template_seed.csv`
+- 已新增 `src/31_validate_policy_llm_scores.py`，导出：
+  - `data/interim/policy_text/policy_llm_validation_detail_seed.csv`
+  - `outputs/tables/table_13_policy_llm_validation_readiness.csv`
+  - `outputs/tables/table_13_policy_llm_validation_readiness.tex`
+- 当前 Table 13 结果：
+  - 登记文档数 = `3`
+  - 已评分行数 = `0`
+  - 人工复核行数 = `0`
+  - 验证就绪行数 = `0`
+  - readiness_status = `not_ready`
+
+说明：
+
+- 这一步推进的是 validated LLM scoring 的可复现框架，不虚构 LLM 分数。
+- 当前政策文本机制仍只能写作“方法创新 + 技术附录候选”，不能写成最终 validated LLM 机制证据。
+- 后续若要将政策文本机制推进为正文机制结果，需要填充 LLM 分数、记录模型/运行批次、完成抽样人工复核，并重新运行 `src/31_validate_policy_llm_scores.py` 与后续机制并表/回归。

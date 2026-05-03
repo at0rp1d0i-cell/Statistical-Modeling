@@ -14,6 +14,7 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
     heterogeneity_group_table = tmp_path / "table_10.csv"
     heterogeneity_difference_table = tmp_path / "table_12.csv"
     policy_table = tmp_path / "table_05.csv"
+    policy_llm_validation_table = tmp_path / "table_13.csv"
     output_csv = tmp_path / "table_09.csv"
     output_tex = tmp_path / "table_09.tex"
 
@@ -94,6 +95,13 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
             "nobs": [100],
         }
     ).to_csv(policy_table, index=False)
+    pd.DataFrame(
+        {
+            "readiness_status": ["not_ready"],
+            "total_registered_docs": [3],
+            "validation_ready_rows": [0],
+        }
+    ).to_csv(policy_llm_validation_table, index=False)
 
     result = run(
         [
@@ -117,6 +125,8 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
             str(heterogeneity_difference_table),
             "--policy-table-path",
             str(policy_table),
+            "--policy-llm-validation-table-path",
+            str(policy_llm_validation_table),
             "--output-csv-path",
             str(output_csv),
             "--output-tex-path",
@@ -138,4 +148,5 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
     assert "正式异质性分组" in exported["证据环节"].tolist()
     assert "人口变量敏感性" in exported["证据环节"].tolist()
     assert exported.loc[exported["证据环节"] == "政策文本机制", "论文用途"].iloc[0] == "技术附录"
+    assert exported.loc[exported["证据环节"] == "政策文本机制", "来源"].iloc[0] == "Table 5 / Table 13 / Figure 4"
     assert exported.loc[exported["证据环节"] == "正式异质性分组", "来源"].iloc[0] == "Table 10 / Table 12 / Figure 6"

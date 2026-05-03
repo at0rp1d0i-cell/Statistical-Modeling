@@ -19,6 +19,7 @@ DEFAULT_CATE_SUMMARY = INTERIM_DATA_DIR / "modeling" / "heterogeneity_candidate_
 DEFAULT_HETEROGENEITY_GROUP_TABLE = TABLES_DIR / "table_10_heterogeneity_group_summary.csv"
 DEFAULT_HETEROGENEITY_DIFFERENCE_TABLE = TABLES_DIR / "table_12_heterogeneity_group_differences.csv"
 DEFAULT_POLICY_TABLE = TABLES_DIR / "table_05_policy_seed_mechanism_candidate.csv"
+DEFAULT_POLICY_LLM_VALIDATION_TABLE = TABLES_DIR / "table_13_policy_llm_validation_readiness.csv"
 DEFAULT_OUTPUT_CSV = TABLES_DIR / "table_09_current_evidence_synthesis.csv"
 DEFAULT_OUTPUT_TEX = TABLES_DIR / "table_09_current_evidence_synthesis.tex"
 
@@ -34,6 +35,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--heterogeneity-group-table-path", type=Path, default=DEFAULT_HETEROGENEITY_GROUP_TABLE)
     parser.add_argument("--heterogeneity-difference-table-path", type=Path, default=DEFAULT_HETEROGENEITY_DIFFERENCE_TABLE)
     parser.add_argument("--policy-table-path", type=Path, default=DEFAULT_POLICY_TABLE)
+    parser.add_argument("--policy-llm-validation-table-path", type=Path, default=DEFAULT_POLICY_LLM_VALIDATION_TABLE)
     parser.add_argument("--output-csv-path", type=Path, default=DEFAULT_OUTPUT_CSV)
     parser.add_argument("--output-tex-path", type=Path, default=DEFAULT_OUTPUT_TEX)
     return parser
@@ -67,6 +69,7 @@ def build_evidence_synthesis(
     heterogeneity_group: pd.DataFrame | None,
     heterogeneity_difference: pd.DataFrame | None,
     policy: pd.DataFrame,
+    policy_llm_validation: pd.DataFrame | None,
     source_paths: dict[str, Path],
 ) -> pd.DataFrame:
     require_columns(dml, ["outcome_column", "ate", "ci_lower", "ci_upper", "p_value"], source_paths["dml"])
@@ -85,6 +88,12 @@ def build_evidence_synthesis(
         )
     require_columns(cate, ["cate_mean", "cate_median"], source_paths["cate"])
     require_columns(policy, ["variable_name", "nobs"], source_paths["policy"])
+    if policy_llm_validation is not None and not policy_llm_validation.empty:
+        require_columns(
+            policy_llm_validation,
+            ["readiness_status", "total_registered_docs", "validation_ready_rows"],
+            source_paths["policy_llm_validation"],
+        )
     if heterogeneity_group is not None and not heterogeneity_group.empty:
         require_columns(
             heterogeneity_group,
@@ -167,6 +176,21 @@ def build_evidence_synthesis(
         heterogeneity_use = "候选结果"
         heterogeneity_support = "方向一致"
         heterogeneity_boundary = "CATE技术预检查；正式分组表未读取。"
+
+    if policy_llm_validation is not None and not policy_llm_validation.empty:
+        policy_validation_row = policy_llm_validation.iloc[0]
+        policy_source = "Table 5 / Table 13 / Figure 4"
+        policy_core = (
+            f"seed候选变量数={policy['variable_name'].nunique()}, 回归样本量={int(policy['nobs'].max())}; "
+            f"LLM验证状态={policy_validation_row['readiness_status']}, "
+            f"验证就绪={int(policy_validation_row['validation_ready_rows'])}/"
+            f"{int(policy_validation_row['total_registered_docs'])}"
+        )
+        policy_boundary = "Table 13仅记录LLM评分准备与复核就绪度；not_ready时政策文本仍为技术附录证据。"
+    else:
+        policy_source = "Table 5 / Figure 4"
+        policy_core = f"seed候选变量数={policy['variable_name'].nunique()}, 回归样本量={int(policy['nobs'].max())}"
+        policy_boundary = "seed rule-proxy，未完成完整语料与validated LLM scoring。"
 
     rows = [
         {
@@ -252,12 +276,12 @@ def build_evidence_synthesis(
         {
             "序号": 9,
             "证据环节": "政策文本机制",
-            "来源": "Table 5 / Figure 4",
-            "核心数值": f"seed候选变量数={policy['variable_name'].nunique()}, 回归样本量={int(policy['nobs'].max())}",
+            "来源": policy_source,
+            "核心数值": policy_core,
             "方向": "技术链路跑通",
             "论文用途": "技术附录",
             "对主命题支持": "暂不作为正式机制证据",
-            "边界说明": "seed rule-proxy，未完成完整语料与validated LLM scoring。",
+            "边界说明": policy_boundary,
         },
     ]
     return pd.DataFrame(rows)
@@ -287,6 +311,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "heterogeneity_group": args.heterogeneity_group_table_path,
         "heterogeneity_difference": args.heterogeneity_difference_table_path,
         "policy": args.policy_table_path,
+        "policy_llm_validation": args.policy_llm_validation_table_path,
     }
     table = build_evidence_synthesis(
         dml=pd.read_csv(args.dml_table_path),
@@ -306,6 +331,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             else None
         ),
         policy=pd.read_csv(args.policy_table_path),
+        policy_llm_validation=(
+            pd.read_csv(args.policy_llm_validation_table_path)
+            if args.policy_llm_validation_table_path.exists()
+            else None
+        ),
         source_paths=source_paths,
     )
     csv_path = write_table(table, args.output_csv_path)
