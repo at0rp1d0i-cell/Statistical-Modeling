@@ -129,6 +129,7 @@ The current paper-writing entrypoints are:
 
 - `docs/paper/01_draft.md` — project state, writing boundaries, and result notes
 - `docs/paper/02_manuscript_v0_1.md` — continuous v0.1 manuscript draft for expansion
+- `docs/paper/03_manuscript_v0_2.md` — current可评审完整初稿，整合 DML、稳健性、异质性和政策文本 readiness 边界
 - `docs/paper/table-figure-inventory.md` — table, figure, and manuscript asset inventory
 
 Current sample descriptive, robustness, evidence-synthesis, and heterogeneity tables can be regenerated with:
