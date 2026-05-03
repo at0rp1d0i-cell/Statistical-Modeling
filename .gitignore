@@ -18,6 +18,7 @@ data/processed/*
 outputs/tables/*
 outputs/figures/*
 logs/*
+dist/
 !logs/data_records/
 !logs/data_records/**
 !data/raw/.gitkeep

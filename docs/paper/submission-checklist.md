@@ -51,6 +51,8 @@
 - [ ] 确认 `data/raw/` 中哪些文件可提交，哪些受授权限制只能在说明中描述。
 - [ ] 准备 `data/processed/` 或最小可复现输入表，避免提交过大的中间文件。
 - [ ] 补充数据来源说明：PKU 指数、CMCC、控制变量来源。
+- [x] 使用 `python3 src/32_prepare_submission_package.py` 生成本地提交包；默认不复制 `data/raw/`。
+- [ ] 若确认派生数据可提交，再使用 `python3 src/32_prepare_submission_package.py --include-derived-data` 生成含派生数据版本。
 - [ ] 运行完整测试：`python3 -m pytest -q`。
 - [ ] 运行语法检查：`python3 -m py_compile $(find src tests -name '*.py' | sort)`。
 - [ ] 确认 `README.md` 中运行顺序与当前脚本一致。
@@ -80,5 +82,6 @@
 2. 按 Table/Figure inventory 插入正文表图占位。
 3. 统一参考文献格式。
 4. 做一次最终重跑和测试。
-5. 完成 AI 使用表、承诺书、报名表、查重报告。
-6. 整理代码包和数据包。
+5. 用 `src/32_prepare_submission_package.py` 生成本地提交包。
+6. 完成 AI 使用表、承诺书、报名表、查重报告。
+7. 整理最终代码包和数据包。

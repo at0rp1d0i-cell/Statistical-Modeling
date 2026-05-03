@@ -74,6 +74,7 @@ Current project-specific continuation scripts:
 29. `src/29_export_heterogeneity_group_differences.py`
 30. `src/30_prepare_policy_llm_scoring_batch.py`
 31. `src/31_validate_policy_llm_scores.py`
+32. `src/32_prepare_submission_package.py`
 
 ## Policy-text corpus lane
 
@@ -107,6 +108,26 @@ python3 src/31_validate_policy_llm_scores.py
 ```
 
 These commands prepare JSONL scoring payloads, a human/LLM review template, validation detail rows, and `Table 13` readiness output. They do not fabricate LLM scores; a `not_ready` status means the policy-text lane remains technical scaffolding rather than final mechanism evidence.
+
+## Submission packaging
+
+After regenerating the paper-facing tables and figures, prepare a local review bundle with:
+
+```bash
+python3 src/32_prepare_submission_package.py
+```
+
+The command writes `dist/submission_package_current/` and `dist/submission_package_current.zip`.
+The bundle includes the manuscript Markdown draft, reference files, table/figure outputs, source code,
+tests, `README.md`, `environment.yml`, and a `DATA_NOTICE.md` explaining why raw data are excluded by default.
+
+Optional derived/interim modeling data can be copied with:
+
+```bash
+python3 src/32_prepare_submission_package.py --include-derived-data
+```
+
+Use this only after confirming which derived data files are allowed in the final competition package.
 
 ## Current DML status
 
@@ -152,7 +173,7 @@ python3 src/25_export_result_figures.py
 python3 src/27_export_heterogeneity_groups.py
 ```
 
-These commands write paper-facing tables under `outputs/tables/` and PDF figures plus a manifest under `outputs/figures/`. `src/06_robustness.py` currently exports the OLS TWFE candidate benchmark, the DML residual-permutation placebo check, and the DML learner-replacement robustness table. `src/26_export_evidence_synthesis.py` exports the current evidence-chain synthesis table for writing and presentation. `src/27_export_heterogeneity_groups.py` exports Table 10 and Figure 6 for the confirmed region / economic-development / industrial-structure heterogeneity dimensions. `src/28_export_population_sensitivity.py` exports Table 11 for the population-control sensitivity check. `src/29_export_heterogeneity_group_differences.py` exports Table 12 for city-level bootstrap group-difference diagnostics. `src/31_validate_policy_llm_scores.py` exports Table 13 for policy-text LLM validation readiness. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs remain ignored by git unless explicitly force-added as final competition artifacts.
+These commands write paper-facing tables under `outputs/tables/` and PDF figures plus a manifest under `outputs/figures/`. `src/06_robustness.py` currently exports the OLS TWFE candidate benchmark, the DML residual-permutation placebo check, and the DML learner-replacement robustness table. `src/26_export_evidence_synthesis.py` exports the current evidence-chain synthesis table for writing and presentation. `src/27_export_heterogeneity_groups.py` exports Table 10 and Figure 6 for the confirmed region / economic-development / industrial-structure heterogeneity dimensions. `src/28_export_population_sensitivity.py` exports Table 11 for the population-control sensitivity check. `src/29_export_heterogeneity_group_differences.py` exports Table 12 for city-level bootstrap group-difference diagnostics. `src/31_validate_policy_llm_scores.py` exports Table 13 for policy-text LLM validation readiness. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs and local submission bundles under `dist/` remain ignored by git unless explicitly force-added as final competition artifacts.
 
 ## Heterogeneity runtime note
 
