@@ -9,7 +9,9 @@
 | Manuscript v0.1 | `docs/paper/02_manuscript_v0_1.md` | 技术初稿完成，题目已确认数字普惠金融主线 | 可作为正文扩写底稿；最终定稿前需随人口稳健性、正式异质性和政策文本 validated LLM 结果更新 |
 | Manuscript v0.2 | `docs/paper/03_manuscript_v0_2.md` | 可评审完整初稿完成 | 当前最完整正文底稿；可用于内部评审、答辩结构演练和后续格式化，正式提交前仍需补齐参考文献格式、表图排版和 AI 使用说明 |
 | Submission candidate | `docs/paper/04_submission_manuscript_candidate.md` | 投稿候选稿完成 | 从 v0.2 整理而来，去除内部复现命令和表图清单，补入候选参考文献；用于转 Word、人工改写、查重和最终排版 |
-| Submission DOCX | `dist/04_submission_manuscript_candidate.docx` | 本地生成 | 由 `src/33_export_submission_docx.py` 生成；默认将当前 Table 1–13 CSV 和 Figure 1–6 插图清单追加为文末附录，图件提供 PDF/PNG/JPG，供 Word/WPS 编辑时移动到正文 |
+| Submission DOCX | `dist/04_submission_manuscript_candidate.docx` | 本地生成 | 由 `src/33_export_submission_docx.py` 生成；默认将当前 Table 1–15 CSV 和 Figure 1–9 插图清单追加为文末附录，图件提供 PDF/PNG/JPG，供 Word/WPS 编辑时移动到正文 |
+| Final editing guide | `docs/paper/final-editing-guide.md` | 终稿编辑指南完成 | 规定正文/附录表图放置、Word/WPS 编辑顺序、识别边界和提交前人工核对项；随提交包复制到 `paper/final-editing-guide.md` |
+| Materials review | `docs/paper/05_materials_and_adversarial_review.md` | 反向评估与素材清单完成 | 从评委质疑视角记录当前证据链软肋、新增支撑表图和下一轮增强方向 |
 
 ## 表格
 
@@ -28,6 +30,8 @@
 | Table 11 | `outputs/tables/table_11_population_sensitivity_robustness.csv` / `.tex` | `src/28_export_population_sensitivity.py` | 首轮完成 | 人口变量敏感性稳健性；人口不进入主规格，加入后 ATE 收缩且不显著，正文需作为口径敏感性边界说明 |
 | Table 12 | `outputs/tables/table_12_heterogeneity_group_differences.csv` / `.tex` | `src/29_export_heterogeneity_group_differences.py` | 首轮完成 | 城市层面 CATE 均值 bootstrap 组间差异诊断；用于增强异质性叙述，不等同重新估计分组 DML |
 | Table 13 | `outputs/tables/table_13_policy_llm_validation_readiness.csv` / `.tex` | `src/31_validate_policy_llm_scores.py` | 验证框架完成，当前 not_ready | 政策文本 LLM 评分验证就绪度；当前只记录评分准备与复核缺口，不作为正式机制证据 |
+| Table 14 | `outputs/tables/table_14_sample_construction_coverage.csv` / `.tex` | `src/34_export_paper_support_materials.py` | 支撑素材完成 | 样本构造与覆盖情况；增强数据可信度，不作为因果证据 |
+| Table 15 | `outputs/tables/table_15_variable_correlation_matrix.csv` / `.tex` | `src/34_export_paper_support_materials.py` | 支撑素材完成 | 主要变量相关系数矩阵；用于描述性关系和共线性初筛，不作为因果证据 |
 
 ## 图形
 
@@ -39,20 +43,30 @@
 | Figure 4 | `outputs/figures/figure_04_policy_seed_mechanism_snapshot.pdf` | `src/25_export_result_figures.py` | seed 技术附录候选 | seed 中央政策规则代理覆盖与分数快照；不进入正文主结果，非 validated LLM scoring |
 | Figure 5 | `outputs/figures/figure_05_dml_placebo_distribution.pdf` | `src/06_robustness.py` | 候选完成 | DML 残差置换安慰剂分布图；用于稳健性章节候选证据 |
 | Figure 6 | `outputs/figures/figure_06_heterogeneity_groups.pdf` | `src/27_export_heterogeneity_groups.py` | 首轮完成 | 区域、经济发展水平、产业结构分组 CATE 均值与近似区间；用于异质性章节 |
-| Figure manifest | `outputs/figures/figure_manifest.csv` | `src/25_export_result_figures.py` | 已生成 | 记录图形 caption、来源与 caveat |
+| Figure 7 | `outputs/figures/figure_07_sample_coverage_by_year.pdf` | `src/34_export_paper_support_materials.py` | 支撑素材完成 | DML 样本逐年覆盖；用于数据章节增强样本可信度 |
+| Figure 8 | `outputs/figures/figure_08_robustness_evidence_forest.pdf` | `src/34_export_paper_support_materials.py` | 支撑素材完成 | 强度口径稳健性证据森林图；用于稳健性章节快速展示方向与人口敏感性边界 |
+| Figure 9 | `outputs/figures/figure_09_regional_descriptive_trends.pdf` | `src/34_export_paper_support_materials.py` | 支撑素材完成 | 区域描述性趋势；用于异质性背景，不作为因果证据 |
+| Figure manifest | `outputs/figures/figure_manifest.csv` | `src/25_export_result_figures.py` | 已生成 | 记录 Figure 1—4 caption、来源与 caveat；Figure 5—9 由 DOCX fallback 规则补入图件清单 |
 
-> 图件格式说明：`src/25_export_result_figures.py`、`src/06_robustness.py` 和 `src/27_export_heterogeneity_groups.py` 当前均会为论文图件同时输出 `.pdf`、`.png` 和 `.jpg`。论文正式排版优先使用 PDF 或 PNG；JPG 主要用于兼容只接受位图的场景。
+> 图件格式说明：`src/25_export_result_figures.py`、`src/06_robustness.py`、`src/27_export_heterogeneity_groups.py` 和 `src/34_export_paper_support_materials.py` 当前均会为论文图件同时输出 `.pdf`、`.png` 和 `.jpg`。论文正式排版优先使用 PDF 或 PNG；JPG 主要用于兼容只接受位图的场景。
+
+## 正文与附录放置建议
+
+- 正文优先：Table 1、Table 2、Table 6、Table 7、Table 8、Table 10、Table 11、Table 12、Table 14；Figure 1、Figure 2、Figure 5、Figure 6、Figure 7、Figure 8。
+- 技术附录优先：Table 3、Table 4、Table 5、Table 9、Table 13、Table 15；Figure 3、Figure 4、Figure 9。
+- Word/WPS 插图优先级：PDF（矢量） > PNG（排版兼容） > JPG（最后兼容备选）。
+- 详细移动顺序和不可过度宣称边界见 `docs/paper/final-editing-guide.md`。
 
 ## 2026-05-03 本地重跑记录
 
 - 已按 `docs/paper/submission-checklist.md` 的表图脚本顺序重跑：
-  `src/03_eda.py`、`src/06_robustness.py`、`src/28_export_population_sensitivity.py`、`src/27_export_heterogeneity_groups.py`、`src/29_export_heterogeneity_group_differences.py`、`src/30_prepare_policy_llm_scoring_batch.py`、`src/31_validate_policy_llm_scores.py`、`src/26_export_evidence_synthesis.py`、`src/25_export_result_figures.py`。
-- 生成物检查：`outputs/tables/table_01` 至 `table_13` 的当前合同文件均存在；所有 `table_*.tex` 均包含 `booktabs` 三线表结构。
-- 图件检查：`outputs/figures/figure_01` 至 `figure_06` 的当前合同 PDF 均存在，`file` 识别为 1 页 PDF；`figure_manifest.csv` 已生成。
+  `src/03_eda.py`、`src/06_robustness.py`、`src/28_export_population_sensitivity.py`、`src/27_export_heterogeneity_groups.py`、`src/29_export_heterogeneity_group_differences.py`、`src/30_prepare_policy_llm_scoring_batch.py`、`src/31_validate_policy_llm_scores.py`、`src/26_export_evidence_synthesis.py`、`src/25_export_result_figures.py`、`src/34_export_paper_support_materials.py`。
+- 生成物检查：`outputs/tables/table_01` 至 `table_15` 的当前合同文件均存在；所有 `table_*.tex` 均包含 `booktabs` 三线表结构。
+- 图件检查：`outputs/figures/figure_01` 至 `figure_09` 的当前合同 PDF/PNG/JPG 均存在；`figure_manifest.csv` 已生成并由 DOCX fallback 补入 Figure 5—9。
 - 注意：`outputs/` 默认被 `.gitignore` 忽略；若最终提交包需要包含表图成品，应单独打包或按最终提交策略 force-add。
 
 ## 下一批表图缺口
 
 1. 实际 LLM 评分执行与抽样人工复核（需填充 `policy_llm_score_review_template_seed.csv` 或完整语料版本）。
-2. 异质性理论解释与政策含义段落。
+2. 若需继续增强证明力，可单独确认数字普惠金融分项替换处理变量、滞后处理变量或分组 DML 再估计。
 3. 若后续调整样本、变量或模型规格，需再次重跑全部表图并更新本清单。

@@ -21,6 +21,7 @@ def test_prepare_submission_package_allows_missing_and_excludes_raw_data(tmp_pat
     (project_root / "tests" / "test_demo.py").write_text("def test_demo():\n    assert True\n", encoding="utf-8")
     (project_root / "docs" / "paper" / "03_manuscript_v0_2.md").write_text("paper\n", encoding="utf-8")
     (project_root / "docs" / "paper" / "04_submission_manuscript_candidate.md").write_text("# 候选稿\n\n正文\n", encoding="utf-8")
+    (project_root / "docs" / "paper" / "final-editing-guide.md").write_text("# 最终 Word 编辑指南\n", encoding="utf-8")
     (project_root / "outputs" / "tables" / "table_01_descriptive_statistics.csv").write_text("a\n1\n", encoding="utf-8")
     (project_root / "outputs" / "figures" / "figure_manifest.csv").write_text(
         "figure_id,filename,caption_cn,caption_en,source,status,caveat\n"
@@ -54,6 +55,7 @@ def test_prepare_submission_package_allows_missing_and_excludes_raw_data(tmp_pat
     assert (package_dir / "MANIFEST.md").exists()
     assert (package_dir / "data" / "DATA_NOTICE.md").exists()
     assert (package_dir / "paper" / "04_submission_manuscript_candidate.docx").exists()
+    assert (package_dir / "paper" / "final-editing-guide.md").exists()
     assert (package_dir / "code" / "src" / "demo.py").exists()
     assert not (package_dir / "code" / "src" / "demo.pyc").exists()
     assert not (package_dir / "code" / "src" / "__pycache__").exists()
@@ -63,6 +65,7 @@ def test_prepare_submission_package_allows_missing_and_excludes_raw_data(tmp_pat
         document_xml = archive.read("word/document.xml").decode("utf-8")
     assert "缺失资产数" in manifest
     assert "Word 初稿：已生成" in manifest
+    assert "final-editing-guide.md" in manifest
     assert "政策文本 LLM 模块当前 `not_ready`" in manifest
     assert "附录：图件清单" in document_xml
     assert "Figure 1 趋势图" in document_xml

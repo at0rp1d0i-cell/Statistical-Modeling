@@ -1,4 +1,4 @@
-# 参赛提交检查清单（v0.1）
+# 参赛提交检查清单（v0.2）
 
 > 依据：2026 年（第十二届）全国大学生统计建模大赛官方通知与《全国大学生统计建模大赛生成式人工智能（AI）工具使用规范（试行）》；本清单用于项目内部收口，不替代学校/赛区最终要求。
 
@@ -12,17 +12,18 @@
 | AI 工具使用情况表 | 待用户/队伍填写 | 官方通知列为参赛材料；AI 使用规范要求披露并保留必要材料 | 根据实际使用 Codex/Claude/LLM 情况如实填写 |
 | 承诺书 | 待用户/队伍填写 | 官方通知列为参赛材料 | 使用大赛附件模板 |
 | 报名表 | 待用户/队伍填写 | 官方通知列为参赛材料 | 使用大赛附件模板 |
-| 论文 | 投稿候选稿完成 | `docs/paper/04_submission_manuscript_candidate.md`；本地 DOCX 可由 `src/33_export_submission_docx.py` 生成并默认附带表格与图件清单附录 | 排版/压缩字数/人工改写 |
+| 论文 | 投稿候选稿完成 | `docs/paper/04_submission_manuscript_candidate.md`；本地 DOCX 可由 `src/33_export_submission_docx.py` 生成；最终编辑指南见 `docs/paper/final-editing-guide.md` | 按指南排版/压缩字数/人工改写 |
 | 数据包 | 部分就绪 | `data/raw/`, `data/interim/`, `outputs/` | 整理可公开提交版本，剔除不应提交的原始授权数据 |
 | 代码包 | 基本就绪 | `src/`, `tests/`, `README.md`, `environment.yml` | 最终重跑并写运行说明 |
 
 ## 2. 论文定稿任务
 
 - [ ] 将 `docs/paper/04_submission_manuscript_candidate.md` 转成 Word 正式稿，并由参赛队人工审阅、改写和确认正文表述。
-- [x] 生成本地 Word 初稿：`python3 src/33_export_submission_docx.py`（默认追加 Table 1–13 表格附录和 Figure 1–6 图件清单，图件同时提供 PDF/PNG/JPG，供 Word/WPS 内移动到正文）。
+- [x] 建立最终 Word 编辑指南：`docs/paper/final-editing-guide.md`（规定正文/附录表图放置、编辑顺序和不可过度宣称边界）。
+- [x] 生成本地 Word 初稿：`python3 src/33_export_submission_docx.py`（默认追加 Table 1–15 表格附录和 Figure 1–9 图件清单，图件同时提供 PDF/PNG/JPG，供 Word/WPS 内移动到正文）。
 - [ ] 统一标题、摘要、关键词、一级/二级标题格式。
-- [ ] 将正文表图编号与 `docs/paper/table-figure-inventory.md` 对齐。
-- [ ] 决定 Table 5 / Figure 4 / Table 13 是否全部放入技术附录。
+- [ ] 按 `docs/paper/final-editing-guide.md` 移动正文表图，并将正文表图编号与 `docs/paper/table-figure-inventory.md` 对齐。
+- [x] 当前放置建议已确认：正文优先 Table 1/2/6/7/8/10/11/12 与 Figure 1/2/5/6；技术附录放 Table 3/4/5/9/13 与 Figure 3/4。
 - [ ] 将 Table 9 定位为答辩/结论汇总，不替代模型结果表。
 - [ ] 补齐参考文献格式，至少覆盖 `docs/paper/references.md` 与 `docs/paper/references.bib` 中的核心文献。
 - [ ] 明确“DML 不能自动解决所有内生性”的识别边界。
@@ -42,11 +43,12 @@
   python3 src/31_validate_policy_llm_scores.py
   python3 src/26_export_evidence_synthesis.py
   python3 src/25_export_result_figures.py
+  python3 src/34_export_paper_support_materials.py
   ```
 - [x] 检查 `outputs/tables/*.tex` 是否满足三线表要求（`booktabs` 结构已存在）。
-- [x] 检查 `outputs/figures/*.pdf` 是否可正常识别为 PDF（当前合同图件均为 1 页 PDF）。
-- [x] 当前图件导出链路同时生成 PNG/JPG，便于 Word/WPS 插图。
-- [ ] 决定是否将最终表图从 ignored outputs 中 force-add 到提交包或单独压缩。
+- [x] 检查 `outputs/figures/*.pdf` 是否可正常识别为 PDF（当前合同图件 Figure 1—9 均生成 PDF/PNG/JPG）。
+- [x] 当前图件导出链路同时生成 PNG/JPG，便于 Word/WPS 插图；新增 Table 14/15 与 Figure 7/8/9 作为论文支撑素材。
+- [x] 当前提交包脚本会复制 ignored `outputs/tables/` 与 `outputs/figures/` 生成物到本地 `dist/submission_package_current/`，无需 force-add 到 Git。
 
 ## 4. 数据与代码包任务
 
@@ -54,11 +56,11 @@
 - [ ] 准备 `data/processed/` 或最小可复现输入表，避免提交过大的中间文件。
 - [ ] 补充数据来源说明：PKU 指数、CMCC、控制变量来源。
 - [x] 使用 `python3 src/32_prepare_submission_package.py` 生成本地提交包；默认不复制 `data/raw/`。
-- [x] 本地提交包自动包含 `paper/04_submission_manuscript_candidate.docx`，并在文末附带当前表格附录与图件清单。
+- [x] 本地提交包自动包含 `paper/final-editing-guide.md`、`paper/05_materials_and_adversarial_review.md` 和 `paper/04_submission_manuscript_candidate.docx`，DOCX 文末附带当前表格附录与图件清单。
 - [ ] 若确认派生数据可提交，再使用 `python3 src/32_prepare_submission_package.py --include-derived-data` 生成含派生数据版本。
-- [ ] 运行完整测试：`python3 -m pytest -q`。
-- [ ] 运行语法检查：`python3 -m py_compile $(find src tests -name '*.py' | sort)`。
-- [ ] 确认 `README.md` 中运行顺序与当前脚本一致。
+- [x] 运行完整测试：`python3 -m pytest -q`（2026-05-03，95 passed）。
+- [x] 运行语法检查：`python3 -m py_compile $(find src tests -name '*.py' | sort)`（2026-05-03，exit 0）。
+- [x] 确认 `README.md` 中运行顺序与当前脚本一致（已包含 `src/34_export_paper_support_materials.py`）。
 - [ ] 导出环境说明：`environment.yml` 或 `requirements` 与实际运行环境一致。
 
 ## 5. AI 使用声明草案
@@ -81,8 +83,8 @@
 
 ## 6. 当前最短冲刺路径
 
-1. 先打开 `dist/04_submission_manuscript_candidate.docx` 或提交包内 `paper/04_submission_manuscript_candidate.docx`，进行人工改写确认。
-2. 按 Table/Figure inventory 插入正文表图占位。
+1. 先阅读 `docs/paper/final-editing-guide.md`，再打开 `dist/04_submission_manuscript_candidate.docx` 或提交包内 `paper/04_submission_manuscript_candidate.docx`，进行人工改写确认。
+2. 按 final editing guide 和 Table/Figure inventory 插入正文表图占位。
 3. 统一参考文献格式。
 4. 做一次最终重跑和测试。
 5. 用 `src/32_prepare_submission_package.py` 生成本地提交包。

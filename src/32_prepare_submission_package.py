@@ -23,6 +23,8 @@ from stat_modeling.delivery.submission_docx import export_submission_docx
 PAPER_DOC_FILES = (
     "03_manuscript_v0_2.md",
     "04_submission_manuscript_candidate.md",
+    "05_materials_and_adversarial_review.md",
+    "final-editing-guide.md",
     "references.md",
     "references.bib",
     "submission-checklist.md",
@@ -57,6 +59,10 @@ TABLE_FILES = (
     "table_12_heterogeneity_group_differences.tex",
     "table_13_policy_llm_validation_readiness.csv",
     "table_13_policy_llm_validation_readiness.tex",
+    "table_14_sample_construction_coverage.csv",
+    "table_14_sample_construction_coverage.tex",
+    "table_15_variable_correlation_matrix.csv",
+    "table_15_variable_correlation_matrix.tex",
 )
 
 FIGURE_FILES = (
@@ -78,6 +84,15 @@ FIGURE_FILES = (
     "figure_06_heterogeneity_groups.pdf",
     "figure_06_heterogeneity_groups.png",
     "figure_06_heterogeneity_groups.jpg",
+    "figure_07_sample_coverage_by_year.pdf",
+    "figure_07_sample_coverage_by_year.png",
+    "figure_07_sample_coverage_by_year.jpg",
+    "figure_08_robustness_evidence_forest.pdf",
+    "figure_08_robustness_evidence_forest.png",
+    "figure_08_robustness_evidence_forest.jpg",
+    "figure_09_regional_descriptive_trends.pdf",
+    "figure_09_regional_descriptive_trends.png",
+    "figure_09_regional_descriptive_trends.jpg",
     "figure_manifest.csv",
 )
 
@@ -203,9 +218,9 @@ def write_package_manifest(
         "",
         "## 内容结构",
         "",
-        "- `paper/`：论文 Markdown 初稿、带表格和图件清单附录的 Word 初稿、参考文献、提交清单和表图清单。",
+        "- `paper/`：论文 Markdown 初稿、带表格和图件清单附录的 Word 初稿、最终 Word 编辑指南、反向评估素材清单、参考文献、提交清单和表图清单。",
         "- `outputs/tables/`：论文表格 CSV 与 LaTeX。",
-        "- `outputs/figures/`：论文图件 PDF 与 figure manifest。",
+        "- `outputs/figures/`：论文图件 PDF/PNG/JPG 与 figure manifest。",
         "- `code/`：复现代码、测试与环境说明。",
         "- `data/DATA_NOTICE.md`：数据提交边界说明。",
         "",
@@ -236,7 +251,7 @@ def write_package_manifest(
         [
             "## 下一步人工任务",
             "",
-            "1. 以 `paper/04_submission_manuscript_candidate.docx` 为 Word 初稿并人工改写、移动表格和插入图件。",
+            "1. 先阅读 `paper/final-editing-guide.md`，再以 `paper/04_submission_manuscript_candidate.docx` 为 Word 初稿并人工改写、移动表格和插入图件。",
             "2. 按学校/赛区模板填写 AI 工具使用情况表、承诺书和报名表。",
             "3. 做查重并控制在官方要求范围内。",
             "4. 核对参考文献元数据和数据源引用。",

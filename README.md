@@ -76,6 +76,7 @@ Current project-specific continuation scripts:
 31. `src/31_validate_policy_llm_scores.py`
 32. `src/32_prepare_submission_package.py`
 33. `src/33_export_submission_docx.py`
+34. `src/34_export_paper_support_materials.py`
 
 ## Policy-text corpus lane
 
@@ -119,7 +120,7 @@ python3 src/32_prepare_submission_package.py
 ```
 
 The command writes `dist/submission_package_current/` and `dist/submission_package_current.zip`.
-The bundle includes the manuscript Markdown draft, a generated DOCX draft with table and figure-list appendices, reference files, table/figure outputs,
+The bundle includes the manuscript Markdown draft, a generated DOCX draft with table and figure-list appendices, the final Word editing guide, the adversarial materials review, reference files, table/figure outputs,
 source code, tests, `README.md`, `environment.yml`, and a `DATA_NOTICE.md` explaining why raw data are excluded by default.
 
 To export only the Word draft without rebuilding the full package:
@@ -128,7 +129,7 @@ To export only the Word draft without rebuilding the full package:
 python3 src/33_export_submission_docx.py
 ```
 
-Use `--no-table-appendix` and/or `--no-figure-appendix` if you need a body-only DOCX. The default DOCX appends the current Table 1–13 CSV outputs and a Figure 1–6 insertion checklist at the end so tables and PDF/PNG/JPG figures can be moved into the正文 during Word/WPS editing.
+Use `--no-table-appendix` and/or `--no-figure-appendix` if you need a body-only DOCX. The default DOCX appends the current Table 1–15 CSV outputs and a Figure 1–9 insertion checklist at the end so tables and PDF/PNG/JPG figures can be moved into 正文 during Word/WPS editing. Follow `docs/paper/final-editing-guide.md` for recommended 正文/技术附录 placement and the required cautionary boundaries.
 
 Optional derived/interim modeling data can be copied with:
 
@@ -162,6 +163,8 @@ The current paper-writing entrypoints are:
 - `docs/paper/03_manuscript_v0_2.md` — current可评审完整初稿，整合 DML、稳健性、异质性和政策文本 readiness 边界
 - `docs/paper/04_submission_manuscript_candidate.md` — 投稿候选 Markdown，去除内部复现清单并补入候选参考文献，供转 Word 和人工改写
 - `docs/paper/table-figure-inventory.md` — table, figure, and manuscript asset inventory
+- `docs/paper/final-editing-guide.md` — final Word/WPS editing order, table/figure placement, and do-not-overclaim checklist
+- `docs/paper/05_materials_and_adversarial_review.md` — adversarial evidence-chain review and support-material backlog
 
 Current sample descriptive, robustness, evidence-synthesis, and heterogeneity tables can be regenerated with:
 
@@ -174,6 +177,7 @@ python3 src/29_export_heterogeneity_group_differences.py
 python3 src/30_prepare_policy_llm_scoring_batch.py
 python3 src/31_validate_policy_llm_scores.py
 python3 src/26_export_evidence_synthesis.py
+python3 src/34_export_paper_support_materials.py
 ```
 
 First-pass figure assets can be regenerated with:
@@ -181,9 +185,10 @@ First-pass figure assets can be regenerated with:
 ```bash
 python3 src/25_export_result_figures.py
 python3 src/27_export_heterogeneity_groups.py
+python3 src/34_export_paper_support_materials.py
 ```
 
-These commands write paper-facing tables under `outputs/tables/` and PDF + PNG + JPG figures plus a manifest under `outputs/figures/`. `src/06_robustness.py` currently exports the OLS TWFE candidate benchmark, the DML residual-permutation placebo check, and the DML learner-replacement robustness table. `src/26_export_evidence_synthesis.py` exports the current evidence-chain synthesis table for writing and presentation. `src/27_export_heterogeneity_groups.py` exports Table 10 and Figure 6 for the confirmed region / economic-development / industrial-structure heterogeneity dimensions. `src/28_export_population_sensitivity.py` exports Table 11 for the population-control sensitivity check. `src/29_export_heterogeneity_group_differences.py` exports Table 12 for city-level bootstrap group-difference diagnostics. `src/31_validate_policy_llm_scores.py` exports Table 13 for policy-text LLM validation readiness. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs and local submission bundles under `dist/` remain ignored by git unless explicitly force-added as final competition artifacts.
+These commands write paper-facing tables under `outputs/tables/` and PDF + PNG + JPG figures plus a manifest/fallback figure list under `outputs/figures/`. `src/06_robustness.py` currently exports the OLS TWFE candidate benchmark, the DML residual-permutation placebo check, and the DML learner-replacement robustness table. `src/26_export_evidence_synthesis.py` exports the current evidence-chain synthesis table for writing and presentation. `src/27_export_heterogeneity_groups.py` exports Table 10 and Figure 6 for the confirmed region / economic-development / industrial-structure heterogeneity dimensions. `src/28_export_population_sensitivity.py` exports Table 11 for the population-control sensitivity check. `src/29_export_heterogeneity_group_differences.py` exports Table 12 for city-level bootstrap group-difference diagnostics. `src/31_validate_policy_llm_scores.py` exports Table 13 for policy-text LLM validation readiness. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs and local submission bundles under `dist/` remain ignored by git unless explicitly force-added as final competition artifacts.
 
 ## Heterogeneity runtime note
 

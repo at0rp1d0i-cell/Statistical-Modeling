@@ -39,6 +39,8 @@ DEFAULT_TABLE_SPECS = (
     SubmissionTableSpec("Table 11 人口变量敏感性", "table_11_population_sensitivity_robustness.csv"),
     SubmissionTableSpec("Table 12 异质性组间差异诊断", "table_12_heterogeneity_group_differences.csv"),
     SubmissionTableSpec("Table 13 政策文本 LLM 验证就绪度", "table_13_policy_llm_validation_readiness.csv", "当前 not_ready；只能作为验证边界说明。"),
+    SubmissionTableSpec("Table 14 样本构造与覆盖情况", "table_14_sample_construction_coverage.csv", "数据可信度支撑表；不改变主规格。"),
+    SubmissionTableSpec("Table 15 主要变量相关系数矩阵", "table_15_variable_correlation_matrix.csv", "描述性关系和多重共线性初筛；不是因果证据。"),
 )
 
 FALLBACK_FIGURE_SPECS = (
@@ -63,6 +65,39 @@ FALLBACK_FIGURE_SPECS = (
         "source": "outputs/tables/table_10_heterogeneity_group_summary.csv",
         "status": "first_pass",
         "caveat": "Grouped CATE summary and approximate intervals; not a subgroup DML re-estimation.",
+    },
+    {
+        "figure_id": "Figure 7",
+        "filename": "figure_07_sample_coverage_by_year.pdf",
+        "png_filename": "figure_07_sample_coverage_by_year.png",
+        "jpg_filename": "figure_07_sample_coverage_by_year.jpg",
+        "caption_cn": "DML 样本年度覆盖情况",
+        "caption_en": "DML sample coverage by year",
+        "source": "outputs/tables/table_14_sample_construction_coverage.csv",
+        "status": "support_material",
+        "caveat": "Sample construction support only; not causal evidence.",
+    },
+    {
+        "figure_id": "Figure 8",
+        "filename": "figure_08_robustness_evidence_forest.pdf",
+        "png_filename": "figure_08_robustness_evidence_forest.png",
+        "jpg_filename": "figure_08_robustness_evidence_forest.jpg",
+        "caption_cn": "强度口径稳健性证据森林图",
+        "caption_en": "Robustness evidence forest for intensity-scale estimates",
+        "source": "outputs/tables/table_02/table_06/table_08/table_11",
+        "status": "support_material",
+        "caveat": "Synthesizes existing estimates; population sensitivity remains a boundary.",
+    },
+    {
+        "figure_id": "Figure 9",
+        "filename": "figure_09_regional_descriptive_trends.pdf",
+        "png_filename": "figure_09_regional_descriptive_trends.png",
+        "jpg_filename": "figure_09_regional_descriptive_trends.jpg",
+        "caption_cn": "区域维度数字普惠金融与碳排放强度描述性趋势",
+        "caption_en": "Regional descriptive trends in digital finance and carbon intensity",
+        "source": "data/interim/modeling/dml_candidate_input_2019_2023.csv",
+        "status": "support_material",
+        "caveat": "Descriptive regional trend only; not causal evidence.",
     },
 )
 
