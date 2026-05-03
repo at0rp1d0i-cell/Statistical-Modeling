@@ -2,7 +2,7 @@
 
 > 版本状态：v0.2 可评审初稿  
 > 写作日期：2026-05-03  
-> 使用边界：本文稿整合当前 2019—2023 城市样本、DML 主结果、稳健性检验、异质性诊断和政策文本 LLM 验证框架。当前版本可用于内部评审、答辩结构演练和后续排版；正式提交前仍需补齐参考文献格式、最终表图排版、AI 使用说明、数据代码包说明，并在是否执行真实 LLM 评分后更新政策文本章节。
+> 使用边界：本文稿整合当前 2019—2023 城市样本、DML 主结果、稳健性检验、异质性诊断和政策文本 LLM 验证框架。当前版本可用于内部评审、答辩结构演练和后续排版；正式提交前仍需将参考文献统一为目标格式、完成最终表图排版、由参赛队人工审阅改写论文正文、填写 AI 使用说明、整理数据代码包，并在是否执行真实 LLM 评分后更新政策文本章节。
 
 ## 摘要
 
@@ -186,13 +186,9 @@ D=m(X)+V, \quad E[V|X]=0.
 
 总体而言，本文当前证据支持“数字普惠金融促进城市低碳转型”的论文主线。下一阶段应围绕三项工作推进定稿：一是完成参考文献和表图格式规范化；二是决定是否执行真实 LLM 评分和人工复核；三是围绕人口敏感性和异质性解释进一步打磨结论边界。
 
-## 参考文献与资料入口（待正式格式化）
+## 参考文献与资料入口
 
-- Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey, W., & Robins, J. (2018). Double/debiased machine learning for treatment and structural parameters. *The Econometrics Journal*.
-- Wager, S., & Athey, S. (2018). Estimation and inference of heterogeneous treatment effects using random forests. *Journal of the American Statistical Association*.
-- Athey, S., Tibshirani, J., & Wager, S. (2019). Generalized random forests.
-- 郭峰等：《测度中国数字普惠金融发展：指数编制与空间特征》及北京大学数字普惠金融指数官方资料。
-- 城市碳排放数据、CMCC 数据及政策文本资料：正式定稿前按数据源说明和政策文件 registry 补充完整引用。
+当前已建立 `docs/paper/references.md` 与 `docs/paper/references.bib` 作为参考文献底稿，覆盖 DML、因果森林、北京大学数字普惠金融指数、数字普惠金融与碳排放强度相关研究、竞赛通知和 AI 使用规范。正式 Word 版应以该清单为基础统一格式，并逐条补齐 CMCC 城市碳排放数据、控制变量原始来源和政策文本语料引用。
 
 ## 表图引用与正文位置建议
 
