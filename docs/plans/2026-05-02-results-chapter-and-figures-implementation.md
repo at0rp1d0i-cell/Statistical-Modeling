@@ -51,7 +51,7 @@ Generate:
 - `figure_01_digital_finance_carbon_intensity_trends.pdf`;
 - `figure_02_dml_effect_intervals.pdf`;
 - `figure_03_candidate_cate_distribution.pdf`;
-- `figure_04_policy_seed_mechanism_trends.pdf`;
+- `figure_04_policy_seed_mechanism_snapshot.pdf`;
 - `figure_manifest.csv`.
 
 **Step 3: Keep caveats explicit**

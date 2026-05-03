@@ -22,10 +22,22 @@ DEFAULT_CATE = INTERIM_DATA_DIR / "modeling" / "heterogeneity_candidate_cate.csv
 DEFAULT_POLICY_PANEL = INTERIM_DATA_DIR / "policy_text" / "policy_mechanism_seed_panel_2019_2023.csv"
 DEFAULT_MANIFEST = FIGURES_DIR / "figure_manifest.csv"
 
-POLICY_COLUMNS = {
-    "sum_policy_strength_city_year": "Policy strength",
-    "mean_execution_clarity_city_year": "Execution clarity",
-    "mean_digital_green_synergy_city_year": "Digital-green synergy",
+POLICY_SCORE_DISPLAY_COLUMNS = {
+    "policy_strength_score": {
+        "label": "Policy strength",
+        "preferred": "mean_policy_strength_city_year",
+        "fallback": "sum_policy_strength_city_year",
+    },
+    "execution_clarity_score": {
+        "label": "Execution clarity",
+        "preferred": "mean_execution_clarity_city_year",
+        "fallback": "mean_execution_clarity_city_year",
+    },
+    "digital_green_synergy_score": {
+        "label": "Digital-green synergy",
+        "preferred": "mean_digital_green_synergy_city_year",
+        "fallback": "mean_digital_green_synergy_city_year",
+    },
 }
 
 
@@ -134,7 +146,7 @@ def export_trend_figure(frame: pd.DataFrame, output_dir: Path, source_path: Path
 
 
 def export_dml_interval_figure(frame: pd.DataFrame, output_dir: Path, source_path: Path = DEFAULT_DML_TABLE) -> dict[str, object]:
-    required = ["ate", "ci_lower", "ci_upper"]
+    required = ["ate", "ci_lower", "ci_upper", "p_value"]
     require_columns(frame, required, source_path)
     if frame.empty:
         raise ValueError(f"{source_path} has no rows for DML interval plotting")
@@ -144,13 +156,15 @@ def export_dml_interval_figure(frame: pd.DataFrame, output_dir: Path, source_pat
         else frame.get("outcome_column", pd.Series([f"Outcome {idx + 1}" for idx in range(len(frame))]))
     )
 
-    fig, axes = plt.subplots(nrows=len(frame), ncols=1, figsize=(7.2, max(2.8, 2.2 * len(frame))))
+    fig, axes = plt.subplots(nrows=len(frame), ncols=1, figsize=(7.2, max(3.6, 2.5 * len(frame))))
     if len(frame) == 1:
         axes = [axes]
+    fig.suptitle("DML effect intervals (95% CI)", fontsize=13, y=0.99)
     for ax, (_, row), label in zip(axes, frame.iterrows(), labels):
         ate = float(row["ate"])
         ci_lower = float(row["ci_lower"])
         ci_upper = float(row["ci_upper"])
+        p_value = float(row["p_value"])
         ax.errorbar(
             ate,
             0,
@@ -163,7 +177,21 @@ def export_dml_interval_figure(frame: pd.DataFrame, output_dir: Path, source_pat
         ax.axvline(0, color="#666666", linestyle="--", linewidth=1)
         ax.set_yticks([])
         ax.set_title(str(label))
-        ax.set_xlabel("Estimated effect and 95% CI")
+        ax.set_xlabel("Estimated effect in outcome units")
+        span = ci_upper - ci_lower
+        padding = span * 0.08 if span else max(abs(ate) * 0.1, 0.01)
+        ax.set_xlim(ci_lower - padding, max(0, ci_upper) + padding)
+        annotation = f"ATE = {ate:.4f}\n95% CI [{ci_lower:.4f}, {ci_upper:.4f}]\np = {p_value:.4f}"
+        ax.text(
+            0.99,
+            0.80,
+            annotation,
+            transform=ax.transAxes,
+            ha="right",
+            va="top",
+            fontsize=8.5,
+            bbox={"boxstyle": "round,pad=0.25", "facecolor": "white", "edgecolor": "#dddddd", "alpha": 0.9},
+        )
     path = save_figure(fig, output_dir / "figure_02_dml_effect_intervals.pdf")
     return {
         "figure_id": "Figure 2",
@@ -202,36 +230,70 @@ def export_cate_distribution_figure(frame: pd.DataFrame, output_dir: Path, sourc
     }
 
 
-def export_policy_seed_trend_figure(
+def export_policy_seed_snapshot_figure(
     frame: pd.DataFrame,
     output_dir: Path,
     source_path: Path = DEFAULT_POLICY_PANEL,
 ) -> dict[str, object]:
-    required = ["year", *POLICY_COLUMNS.keys()]
-    require_columns(frame, required, source_path)
-    trend = frame[required].groupby("year", as_index=True).mean(numeric_only=True).sort_index()
+    require_columns(frame, ["year"], source_path)
+    working = frame.copy()
+    display_score_columns: dict[str, str] = {}
+    for output_column, config in POLICY_SCORE_DISPLAY_COLUMNS.items():
+        source_column = config["preferred"] if config["preferred"] in working.columns else config["fallback"]
+        require_columns(working, [source_column], source_path)
+        working[output_column] = working[source_column]
+        display_score_columns[output_column] = config["label"]
+    if "policy_doc_count" not in working.columns:
+        working["policy_doc_count"] = working[list(display_score_columns)].notna().any(axis=1).astype(int)
+    trend = (
+        working[["year", "policy_doc_count", *display_score_columns.keys()]]
+        .groupby("year", as_index=True)
+        .agg(
+            policy_doc_count=("policy_doc_count", "mean"),
+            **{column: (column, "mean") for column in display_score_columns}
+        )
+        .sort_index()
+    )
+    active_scores = trend[list(display_score_columns)].dropna(how="all")
 
-    fig, ax = plt.subplots(figsize=(7.2, 4.2))
-    if trend.dropna(how="all").empty:
-        ax.text(0.5, 0.5, "No non-missing seed policy scores", ha="center", va="center", transform=ax.transAxes)
-        ax.set_axis_off()
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(8.2, 3.8), gridspec_kw={"width_ratios": [1.1, 1.4]})
+    fig.suptitle("Seed policy-text mechanism coverage snapshot", fontsize=13, y=1.02)
+
+    coverage_ax, score_ax = axes
+    coverage_ax.bar(trend.index.astype(str), trend["policy_doc_count"].fillna(0), color="#7f7f7f")
+    coverage_ax.set_title("Seed document coverage")
+    coverage_ax.set_xlabel("Year")
+    coverage_ax.set_ylabel("Mean docs per city-year")
+    coverage_ax.tick_params(axis="x", rotation=0)
+
+    if active_scores.empty:
+        score_ax.text(0.5, 0.5, "No non-missing seed policy scores", ha="center", va="center", transform=score_ax.transAxes)
+        score_ax.set_axis_off()
     else:
-        for column, label in POLICY_COLUMNS.items():
-            ax.plot(trend.index, trend[column], marker="o", linewidth=1.6, label=label)
-        ax.set_title("Seed policy mechanism trends")
-        ax.set_xlabel("Year")
-        ax.set_ylabel("Annual mean score")
-        ax.set_xticks(trend.index.tolist())
-        ax.legend(frameon=False)
-    path = save_figure(fig, output_dir / "figure_04_policy_seed_mechanism_trends.pdf")
+        latest_active_year = active_scores.index.max()
+        latest_scores = active_scores.loc[latest_active_year, list(display_score_columns)].rename(display_score_columns)
+        score_ax.barh(latest_scores.index.tolist(), latest_scores.values, color=["#4c78a8", "#f58518", "#54a24b"])
+        score_ax.set_title(f"Active seed scores ({latest_active_year})")
+        score_ax.set_xlabel("Rule-proxy score")
+        score_ax.set_xlim(0, max(5.0, float(latest_scores.max()) * 1.15))
+        for idx, value in enumerate(latest_scores.values):
+            score_ax.text(value + 0.05, idx, f"{value:.2f}", va="center", fontsize=8.5)
+    fig.text(
+        0.01,
+        -0.02,
+        "Note: seed central-document rule proxy only; sparse coverage is expected and not a validated LLM trend.",
+        fontsize=8,
+        color="#444444",
+    )
+    path = save_figure(fig, output_dir / "figure_04_policy_seed_mechanism_snapshot.pdf")
     return {
         "figure_id": "Figure 4",
         "filename": path.name,
-        "caption_cn": "政策文本 seed 机制变量年度趋势（规则代理）",
-        "caption_en": "Annual trends in seed policy-text mechanism variables (rule proxy)",
+        "caption_cn": "政策文本 seed 机制变量覆盖与分数快照（规则代理）",
+        "caption_en": "Seed policy-text mechanism coverage and score snapshot (rule proxy)",
         "source": format_source(source_path),
         "status": "seed_rule_proxy_non_final",
-        "caveat": "Seed central-document rule proxy only; not validated LLM scoring.",
+        "caveat": "Seed central-document rule proxy only; sparse coverage snapshot, not a validated LLM trend.",
     }
 
 
@@ -256,7 +318,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         export_trend_figure(dml_input, args.output_dir, args.dml_input_path),
         export_dml_interval_figure(dml_table, args.output_dir, args.dml_table_path),
         export_cate_distribution_figure(cate, args.output_dir, args.cate_path),
-        export_policy_seed_trend_figure(policy_panel, args.output_dir, args.policy_panel_path),
+        export_policy_seed_snapshot_figure(policy_panel, args.output_dir, args.policy_panel_path),
     ]
     manifest_path = export_manifest(records, args.manifest_path)
     print(f"Figures written to: {args.output_dir}")

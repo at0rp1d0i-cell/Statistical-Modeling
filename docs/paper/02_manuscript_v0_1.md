@@ -150,11 +150,11 @@ D = m(X) + V, \quad E[V|X] = 0.
 
 同时，CATE 分布存在一定离散性，提示数字普惠金融的减排效应可能在不同城市之间存在差异。但由于正式异质性解释维度尚未锁定，当前结果不能直接写成“某类城市效应更强”的最终结论。后续可围绕区域分组、经济发展水平、产业结构、财政能力或政策强度等维度构建更有理论含义的 headline 异质性检验。
 
-### 6.5 政策文本机制候选结果
+### 6.5 政策文本机制模块（技术附录候选）
 
 `Table 5` 和 `Figure 4` 展示政策文本 seed 机制候选结果。当前政策文本模块已经完成从政策文件登记、规则代理评分、city-year 聚合到机制候选回归的技术闭环。当前三个候选机制变量包括政策强度、执行明确性和数字绿色协同度，其 seed 回归结果均显示正向且显著的统计关系。
 
-但这些结果必须谨慎解释。当前政策文本变量来自首批中央政策 seed 文档，评分方式为透明规则代理，而非完整语料基础上的 validated LLM scoring。因此，当前结果只能证明政策文本机制变量可以进入建模链路，并为后续机制分析提供接口；不能直接将其作为最终政策机制发现。正式论文若要突出 LLM 政策文本创新，需要进一步扩展政策语料、制定评分准则、进行抽样人工校验，并记录评分一致性和误差控制过程。
+但这些结果必须谨慎解释。当前政策文本变量来自首批中央政策 seed 文档，评分方式为透明规则代理，而非完整语料基础上的 validated LLM scoring。因此，当前结果只能证明政策文本机制变量可以进入建模链路，并为后续机制分析提供接口；不能直接将其作为最终政策机制发现。正式论文若要突出 LLM 政策文本创新，需要进一步扩展政策语料、制定评分准则、进行抽样人工校验，并记录评分一致性和误差控制过程。就当前版本而言，`Table 5` 和 `Figure 4` 不建议放入正文主结果表图，而应放入技术附录或机制模块说明；其中 `Figure 4` 已改为 seed 覆盖与分数快照，不再以趋势图形式呈现。
 
 ## 7 讨论
 
@@ -193,4 +193,4 @@ D = m(X) + V, \quad E[V|X] = 0.
 - `Figure 1`: `outputs/figures/figure_01_digital_finance_carbon_intensity_trends.pdf`
 - `Figure 2`: `outputs/figures/figure_02_dml_effect_intervals.pdf`
 - `Figure 3`: `outputs/figures/figure_03_candidate_cate_distribution.pdf`
-- `Figure 4`: `outputs/figures/figure_04_policy_seed_mechanism_trends.pdf`
+- `Figure 4`: `outputs/figures/figure_04_policy_seed_mechanism_snapshot.pdf`

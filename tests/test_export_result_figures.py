@@ -68,7 +68,11 @@ def test_export_result_figures_runs_with_explicit_inputs(tmp_path):
         "figure_01_digital_finance_carbon_intensity_trends.pdf",
         "figure_02_dml_effect_intervals.pdf",
         "figure_03_candidate_cate_distribution.pdf",
-        "figure_04_policy_seed_mechanism_trends.pdf",
-        "manifest.csv",
-    }
+            "figure_04_policy_seed_mechanism_snapshot.pdf",
+            "manifest.csv",
+        }
     assert expected.issubset({path.name for path in figure_dir.iterdir()})
+    exported_manifest = pd.read_csv(manifest)
+    figure_04 = exported_manifest.loc[exported_manifest["figure_id"] == "Figure 4"].iloc[0]
+    assert figure_04["filename"] == "figure_04_policy_seed_mechanism_snapshot.pdf"
+    assert "not a validated LLM trend" in figure_04["caveat"]

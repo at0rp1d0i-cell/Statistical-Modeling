@@ -34,7 +34,7 @@ Add `src/25_export_result_figures.py` as a thin numbered reporting entrypoint. I
 1. normalized annual trend for digital inclusive finance and carbon intensity;
 2. DML estimate intervals for the main and robustness outcomes;
 3. candidate CATE distribution;
-4. seed policy mechanism annual trends.
+4. seed policy mechanism coverage and score snapshot.
 
 Update `docs/paper/01_draft.md` with a results-chapter skeleton that separates current evidence from non-final research-design claims. Add `docs/paper/table-figure-inventory.md` as the paper-facing checklist for tables and figures.
 

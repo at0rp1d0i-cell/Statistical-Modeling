@@ -121,13 +121,13 @@
   - `Figure 1`: 数字普惠金融与碳排放强度年度趋势
   - `Figure 2`: DML 主结果与稳健性估计区间
   - `Figure 3`: 候选 CATE 分布
-  - `Figure 4`: 政策文本 seed 机制变量年度趋势
+  - `Figure 4`: 政策文本 seed 机制覆盖与分数快照
 
 说明：
 
 - `Figure 1` 是描述性趋势，不是因果证据
 - `Figure 3` 仍是候选异质性技术结果
-- `Figure 4` 仍是 seed rule-proxy 政策机制结果，不是 validated LLM 机制证据
+- `Figure 4` 仍是 seed rule-proxy 政策机制覆盖快照，不是 validated LLM 机制证据，也不是连续政策趋势证据
 - `outputs/figures/*` 默认不进入 git；可由脚本复现生成
 
 ## 2026-05-03 新增执行状态
@@ -192,6 +192,19 @@
 - 强度口径与 DML 主结果方向一致
 - 总量口径没有复制 DML 的负向显著结果，后续需要继续补充安慰剂检验、学习器替换和变量口径审查
 
+### 12. Figure 2 / Figure 4 呈现口径已修正
+
+- `Figure 2` 保留在正文结果候选中，但已增加 ATE、95% CI 和 p-value 注释，明确两个结果变量使用各自量纲
+- `Figure 4` 不再呈现为“年度趋势图”，因为当前 seed 政策文本只在样本窗口内形成稀疏覆盖
+- `Figure 4` 输出文件已改为：
+  - `outputs/figures/figure_04_policy_seed_mechanism_snapshot.pdf`
+- `outputs/figures/figure_04_policy_seed_mechanism_trends.pdf` 已作为过时生成物清理
+
+写作决定：
+
+- `Table 2` 和 `Figure 2` 可以进入结果章节
+- `Table 5` 和 `Figure 4` 当前不建议进入正文主结果表图；应作为政策文本机制技术附录或模块说明，直到完成完整语料和 validated LLM scoring
+
 ## 对写作的直接影响
 
 1. 摘要中可以直接写“已形成 2019—2023 年城市级 DML 候选样本”
@@ -202,3 +215,4 @@
 6. 当前 Table 1 可用于论文描述统计占位，但最终定稿前需随最终样本和变量口径重跑
 7. `02_manuscript_v0_1.md` 可以作为正式论文写作底稿继续扩写，但不能替代最终结果锁定流程
 8. OLS TWFE 对照已经可写入稳健性章节，但必须说明它是候选线性基准参照且总量口径与 DML 存在差异
+9. 当前政策文本 seed 表图只用于技术附录，不作为正文主结果或最终机制证据

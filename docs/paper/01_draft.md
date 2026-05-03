@@ -289,11 +289,11 @@
 
 本部分不得提前写成“哪些类型城市必然更强”的最终结论。正式版本应在锁定区域、经济发展水平、产业结构或政策强度等 headline 异质性维度后再补。
 
-### 13.5 政策文本机制候选分析
+### 13.5 政策文本机制技术附录候选
 
 政策文本机制候选结果对应 `Table 5` 和 `Figure 4`。当前模块已经证明政策文本变量可以完成“文档登记—规则代理评分—city-year 聚合—并表—机制候选回归”的技术闭环。
 
-正文可写为：政策文本机制模块为解释数字普惠金融减排效应差异提供了可扩展接口；当前 seed 结果只用于验证机制变量进入模型链路的可行性。由于尚未完成完整中央—省级—地级市政策语料和 validated LLM scoring，不能将 `Table 5` 写成最终机制发现。
+正文处理建议：`Table 5` 和 `Figure 4` 暂不放入主结果章节作为正式机制发现；更适合放在“政策文本机制模块设计”或技术附录中，用来说明机制变量链路已经跑通。由于尚未完成完整中央—省级—地级市政策语料和 validated LLM scoring，不能将 `Table 5` 写成最终机制发现，也不能把 `Figure 4` 解释为政策趋势图。当前 `Figure 4` 已改为 seed 覆盖与分数快照，专门避免把稀疏 seed 文档误画成连续时间趋势。
 
 ### 13.6 当前表图资产
 
@@ -314,5 +314,5 @@ python3 src/25_export_result_figures.py
 - `outputs/figures/figure_01_digital_finance_carbon_intensity_trends.pdf`
 - `outputs/figures/figure_02_dml_effect_intervals.pdf`
 - `outputs/figures/figure_03_candidate_cate_distribution.pdf`
-- `outputs/figures/figure_04_policy_seed_mechanism_trends.pdf`
+- `outputs/figures/figure_04_policy_seed_mechanism_snapshot.pdf`
 - `outputs/figures/figure_manifest.csv`
