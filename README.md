@@ -108,6 +108,12 @@ Current first-pass robustness result uses `co2_emission_total` as the outcome un
 
 ## Reporting assets
 
+The current paper-writing entrypoints are:
+
+- `docs/paper/01_draft.md` — project state, writing boundaries, and result notes
+- `docs/paper/02_manuscript_v0_1.md` — continuous v0.1 manuscript draft for expansion
+- `docs/paper/table-figure-inventory.md` — table, figure, and manuscript asset inventory
+
 Current candidate-sample descriptive statistics can be regenerated with:
 
 ```bash
