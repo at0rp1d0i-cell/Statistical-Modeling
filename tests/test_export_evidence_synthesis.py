@@ -12,6 +12,7 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
     population_table = tmp_path / "table_11.csv"
     cate_summary = tmp_path / "cate_summary.csv"
     heterogeneity_group_table = tmp_path / "table_10.csv"
+    heterogeneity_difference_table = tmp_path / "table_12.csv"
     policy_table = tmp_path / "table_05.csv"
     output_csv = tmp_path / "table_09.csv"
     output_tex = tmp_path / "table_09.tex"
@@ -78,6 +79,15 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
     ).to_csv(heterogeneity_group_table, index=False)
     pd.DataFrame(
         {
+            "dimension_cn": ["区域"],
+            "group_a_cn": ["东部"],
+            "group_b_cn": ["西部"],
+            "mean_difference_a_minus_b": [0.04],
+            "p_value_approx": [0.03],
+        }
+    ).to_csv(heterogeneity_difference_table, index=False)
+    pd.DataFrame(
+        {
             "variable_name": ["policy_strength"],
             "coefficient": [1.0],
             "p_value": [0.01],
@@ -103,6 +113,8 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
             str(cate_summary),
             "--heterogeneity-group-table-path",
             str(heterogeneity_group_table),
+            "--heterogeneity-difference-table-path",
+            str(heterogeneity_difference_table),
             "--policy-table-path",
             str(policy_table),
             "--output-csv-path",
@@ -126,4 +138,4 @@ def test_export_evidence_synthesis_runs_with_explicit_inputs(tmp_path):
     assert "正式异质性分组" in exported["证据环节"].tolist()
     assert "人口变量敏感性" in exported["证据环节"].tolist()
     assert exported.loc[exported["证据环节"] == "政策文本机制", "论文用途"].iloc[0] == "技术附录"
-    assert exported.loc[exported["证据环节"] == "正式异质性分组", "来源"].iloc[0] == "Table 10 / Figure 6"
+    assert exported.loc[exported["证据环节"] == "正式异质性分组", "来源"].iloc[0] == "Table 10 / Table 12 / Figure 6"

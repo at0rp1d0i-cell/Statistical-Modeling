@@ -71,6 +71,7 @@ Current project-specific continuation scripts:
 26. `src/26_export_evidence_synthesis.py`
 27. `src/27_export_heterogeneity_groups.py`
 28. `src/28_export_population_sensitivity.py`
+29. `src/29_export_heterogeneity_group_differences.py`
 
 ## Policy-text corpus lane
 
@@ -125,8 +126,9 @@ Current sample descriptive, robustness, evidence-synthesis, and heterogeneity ta
 python3 src/03_eda.py
 python3 src/06_robustness.py
 python3 src/28_export_population_sensitivity.py
-python3 src/26_export_evidence_synthesis.py
 python3 src/27_export_heterogeneity_groups.py
+python3 src/29_export_heterogeneity_group_differences.py
+python3 src/26_export_evidence_synthesis.py
 ```
 
 First-pass figure assets can be regenerated with:
@@ -136,7 +138,7 @@ python3 src/25_export_result_figures.py
 python3 src/27_export_heterogeneity_groups.py
 ```
 
-These commands write paper-facing tables under `outputs/tables/` and PDF figures plus a manifest under `outputs/figures/`. `src/06_robustness.py` currently exports the OLS TWFE candidate benchmark, the DML residual-permutation placebo check, and the DML learner-replacement robustness table. `src/26_export_evidence_synthesis.py` exports the current evidence-chain synthesis table for writing and presentation. `src/27_export_heterogeneity_groups.py` exports Table 10 and Figure 6 for the confirmed region / economic-development / industrial-structure heterogeneity dimensions. `src/28_export_population_sensitivity.py` exports Table 11 for the population-control sensitivity check. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs remain ignored by git unless explicitly force-added as final competition artifacts.
+These commands write paper-facing tables under `outputs/tables/` and PDF figures plus a manifest under `outputs/figures/`. `src/06_robustness.py` currently exports the OLS TWFE candidate benchmark, the DML residual-permutation placebo check, and the DML learner-replacement robustness table. `src/26_export_evidence_synthesis.py` exports the current evidence-chain synthesis table for writing and presentation. `src/27_export_heterogeneity_groups.py` exports Table 10 and Figure 6 for the confirmed region / economic-development / industrial-structure heterogeneity dimensions. `src/28_export_population_sensitivity.py` exports Table 11 for the population-control sensitivity check. `src/29_export_heterogeneity_group_differences.py` exports Table 12 for city-level bootstrap group-difference diagnostics. The paper-facing inventory is tracked in `docs/paper/table-figure-inventory.md`. Generated outputs remain ignored by git unless explicitly force-added as final competition artifacts.
 
 ## Heterogeneity runtime note
 

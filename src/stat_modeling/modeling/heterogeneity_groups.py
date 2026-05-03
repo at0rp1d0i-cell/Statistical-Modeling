@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from itertools import combinations
 from dataclasses import dataclass
+from math import erfc
 from math import sqrt
 from typing import Iterable
 
@@ -219,3 +221,111 @@ def build_heterogeneity_group_summary(cate_frame: pd.DataFrame, model_frame: pd.
     cate_with_groups = attach_group_attributes(cate_frame, model_frame)
     summary = summarize_grouped_cate(cate_with_groups)
     return summary, cate_with_groups
+
+
+def _normal_two_sided_p_value(z_stat: float) -> float:
+    return float(erfc(abs(float(z_stat)) / sqrt(2.0)))
+
+
+def _bootstrap_mean_differences(
+    group_a_values: np.ndarray,
+    group_b_values: np.ndarray,
+    n_bootstrap: int,
+    rng: np.random.Generator,
+) -> np.ndarray:
+    if n_bootstrap <= 0:
+        raise ValueError("n_bootstrap must be positive")
+    if len(group_a_values) == 0 or len(group_b_values) == 0:
+        raise ValueError("Both groups must have at least one city-level CATE value")
+    sample_a = rng.choice(group_a_values, size=(n_bootstrap, len(group_a_values)), replace=True)
+    sample_b = rng.choice(group_b_values, size=(n_bootstrap, len(group_b_values)), replace=True)
+    return sample_a.mean(axis=1) - sample_b.mean(axis=1)
+
+
+def build_pairwise_group_differences(
+    cate_with_groups: pd.DataFrame,
+    n_bootstrap: int = 2000,
+    random_seed: int = 42,
+) -> pd.DataFrame:
+    """Build approximate pairwise CATE group-difference diagnostics.
+
+    The input CATE table is city-year level. For difference diagnostics we first
+    collapse to one CATE mean per city, then bootstrap cities within each group.
+    This avoids giving cities with more observed years extra weight and keeps
+    the output as an interpretable heterogeneity diagnostic rather than a
+    replacement for the main DML ATE inference.
+    """
+
+    require_columns(cate_with_groups, ["pku_city_code", "cate_hat"], "cate_with_groups")
+    rng = np.random.default_rng(random_seed)
+    rows: list[dict[str, object]] = []
+    for dimension in GROUP_DIMENSIONS:
+        require_columns(cate_with_groups, [dimension.group_column, dimension.order_column], "cate_with_groups")
+        city_level = (
+            cate_with_groups.groupby(
+                ["pku_city_code", dimension.group_column, dimension.order_column],
+                as_index=False,
+                dropna=False,
+            )
+            .agg(cate_city_mean=("cate_hat", "mean"))
+            .sort_values([dimension.order_column, dimension.group_column, "pku_city_code"])
+            .reset_index(drop=True)
+        )
+        groups = (
+            city_level[[dimension.group_column, dimension.order_column]]
+            .drop_duplicates()
+            .sort_values([dimension.order_column, dimension.group_column])
+            .itertuples(index=False, name=None)
+        )
+        for (group_a, order_a), (group_b, order_b) in combinations(list(groups), 2):
+            values_a = city_level.loc[city_level[dimension.group_column] == group_a, "cate_city_mean"].to_numpy(float)
+            values_b = city_level.loc[city_level[dimension.group_column] == group_b, "cate_city_mean"].to_numpy(float)
+            mean_a = float(values_a.mean())
+            mean_b = float(values_b.mean())
+            difference = mean_a - mean_b
+            boot = _bootstrap_mean_differences(values_a, values_b, n_bootstrap=n_bootstrap, rng=rng)
+            bootstrap_se = float(boot.std(ddof=1)) if len(boot) > 1 else np.nan
+            if np.isfinite(bootstrap_se) and bootstrap_se > 0:
+                z_stat = difference / bootstrap_se
+                p_value = _normal_two_sided_p_value(z_stat)
+            else:
+                z_stat = np.nan
+                p_value = np.nan
+            ci_lower, ci_upper = np.quantile(boot, [0.025, 0.975])
+            if difference < 0:
+                direction_cn = f"{group_a}组CATE更负"
+            elif difference > 0:
+                direction_cn = f"{group_b}组CATE更负"
+            else:
+                direction_cn = "两组CATE均值相同"
+            rows.append(
+                {
+                    "dimension_key": dimension.key,
+                    "dimension_cn": dimension.label_cn,
+                    "group_a_cn": str(group_a),
+                    "group_b_cn": str(group_b),
+                    "group_a_order": int(order_a),
+                    "group_b_order": int(order_b),
+                    "n_city_a": int(len(values_a)),
+                    "n_city_b": int(len(values_b)),
+                    "cate_mean_a": mean_a,
+                    "cate_mean_b": mean_b,
+                    "mean_difference_a_minus_b": difference,
+                    "bootstrap_se": bootstrap_se,
+                    "ci_lower_bootstrap": float(ci_lower),
+                    "ci_upper_bootstrap": float(ci_upper),
+                    "z_stat_approx": float(z_stat) if np.isfinite(z_stat) else np.nan,
+                    "p_value_approx": float(p_value) if np.isfinite(p_value) else np.nan,
+                    "n_bootstrap": int(n_bootstrap),
+                    "direction_cn": direction_cn,
+                    "result_boundary": "城市层面CATE均值bootstrap组间差异诊断；用于异质性叙述，不等同于重新估计分组DML或严格因果效应差异检验。",
+                }
+            )
+    result = pd.DataFrame(rows)
+    dimension_order = {dimension.key: idx for idx, dimension in enumerate(GROUP_DIMENSIONS)}
+    result["dimension_order"] = result["dimension_key"].map(dimension_order)
+    return (
+        result.sort_values(["dimension_order", "group_a_order", "group_b_order", "group_a_cn", "group_b_cn"])
+        .drop(columns="dimension_order")
+        .reset_index(drop=True)
+    )

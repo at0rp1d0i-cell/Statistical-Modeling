@@ -17,6 +17,7 @@ DEFAULT_LEARNER_TABLE = TABLES_DIR / "table_08_dml_learner_replacement_candidate
 DEFAULT_POPULATION_SENSITIVITY_TABLE = TABLES_DIR / "table_11_population_sensitivity_robustness.csv"
 DEFAULT_CATE_SUMMARY = INTERIM_DATA_DIR / "modeling" / "heterogeneity_candidate_cate_summary.csv"
 DEFAULT_HETEROGENEITY_GROUP_TABLE = TABLES_DIR / "table_10_heterogeneity_group_summary.csv"
+DEFAULT_HETEROGENEITY_DIFFERENCE_TABLE = TABLES_DIR / "table_12_heterogeneity_group_differences.csv"
 DEFAULT_POLICY_TABLE = TABLES_DIR / "table_05_policy_seed_mechanism_candidate.csv"
 DEFAULT_OUTPUT_CSV = TABLES_DIR / "table_09_current_evidence_synthesis.csv"
 DEFAULT_OUTPUT_TEX = TABLES_DIR / "table_09_current_evidence_synthesis.tex"
@@ -31,6 +32,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--population-sensitivity-table-path", type=Path, default=DEFAULT_POPULATION_SENSITIVITY_TABLE)
     parser.add_argument("--cate-summary-path", type=Path, default=DEFAULT_CATE_SUMMARY)
     parser.add_argument("--heterogeneity-group-table-path", type=Path, default=DEFAULT_HETEROGENEITY_GROUP_TABLE)
+    parser.add_argument("--heterogeneity-difference-table-path", type=Path, default=DEFAULT_HETEROGENEITY_DIFFERENCE_TABLE)
     parser.add_argument("--policy-table-path", type=Path, default=DEFAULT_POLICY_TABLE)
     parser.add_argument("--output-csv-path", type=Path, default=DEFAULT_OUTPUT_CSV)
     parser.add_argument("--output-tex-path", type=Path, default=DEFAULT_OUTPUT_TEX)
@@ -63,6 +65,7 @@ def build_evidence_synthesis(
     population_sensitivity: pd.DataFrame | None,
     cate: pd.DataFrame,
     heterogeneity_group: pd.DataFrame | None,
+    heterogeneity_difference: pd.DataFrame | None,
     policy: pd.DataFrame,
     source_paths: dict[str, Path],
 ) -> pd.DataFrame:
@@ -87,6 +90,18 @@ def build_evidence_synthesis(
             heterogeneity_group,
             ["dimension_cn", "group_cn", "cate_mean", "n_city"],
             source_paths["heterogeneity_group"],
+        )
+    if heterogeneity_difference is not None and not heterogeneity_difference.empty:
+        require_columns(
+            heterogeneity_difference,
+            [
+                "dimension_cn",
+                "group_a_cn",
+                "group_b_cn",
+                "mean_difference_a_minus_b",
+                "p_value_approx",
+            ],
+            source_paths["heterogeneity_difference"],
         )
 
     main_dml = find_row(dml, "outcome_column", "co2_emission_intensity", source_paths["dml"])
@@ -133,6 +148,18 @@ def build_evidence_synthesis(
         heterogeneity_use = "正文异质性"
         heterogeneity_support = "提供异质性线索"
         heterogeneity_boundary = "基于当前CATE候选估计的分组摘要；近似区间不等同严格subgroup significance test。"
+        if heterogeneity_difference is not None and not heterogeneity_difference.empty:
+            difference_work = heterogeneity_difference.copy()
+            difference_work["abs_difference"] = difference_work["mean_difference_a_minus_b"].astype(float).abs()
+            strongest_difference = difference_work.loc[difference_work["abs_difference"].idxmax()]
+            heterogeneity_source = "Table 10 / Table 12 / Figure 6"
+            heterogeneity_core = (
+                f"{heterogeneity_core}; 最大组间差异="
+                f"{strongest_difference['dimension_cn']}:{strongest_difference['group_a_cn']}-"
+                f"{strongest_difference['group_b_cn']} Δ={fmt(strongest_difference['mean_difference_a_minus_b'])}, "
+                f"p≈{fmt(strongest_difference['p_value_approx'])}"
+            )
+            heterogeneity_boundary = "Table 10为分组摘要，Table 12为城市层面bootstrap组间差异诊断；二者均不等同重新估计分组DML。"
     else:
         heterogeneity_source = "Table 3 / Figure 3"
         heterogeneity_core = f"CATE均值={fmt(cate_row['cate_mean'])}, CATE中位数={fmt(cate_row['cate_median'])}"
@@ -258,6 +285,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "population_sensitivity": args.population_sensitivity_table_path,
         "cate": args.cate_summary_path,
         "heterogeneity_group": args.heterogeneity_group_table_path,
+        "heterogeneity_difference": args.heterogeneity_difference_table_path,
         "policy": args.policy_table_path,
     }
     table = build_evidence_synthesis(
@@ -272,6 +300,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         ),
         cate=pd.read_csv(args.cate_summary_path),
         heterogeneity_group=pd.read_csv(args.heterogeneity_group_table_path) if args.heterogeneity_group_table_path.exists() else None,
+        heterogeneity_difference=(
+            pd.read_csv(args.heterogeneity_difference_table_path)
+            if args.heterogeneity_difference_table_path.exists()
+            else None
+        ),
         policy=pd.read_csv(args.policy_table_path),
         source_paths=source_paths,
     )
