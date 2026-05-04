@@ -139,40 +139,43 @@ def _run_xml(text: str, bold: bool = False, size_half_points: int = 24) -> str:
     )
 
 
+FIXED_24PT_SPACING = '<w:spacing w:line="480" w:lineRule="exact" w:before="0" w:after="0"/>'
+
+
 def _paragraph_xml(block: MarkdownBlock) -> str:
     if block.kind == "heading":
         style = f"Heading{block.level}"
         size = {1: 32, 2: 28, 3: 24}.get(block.level, 24)
         return (
             "<w:p>"
-            f'<w:pPr><w:pStyle w:val="{style}"/><w:spacing w:before="180" w:after="120"/></w:pPr>'
+            f'<w:pPr><w:pStyle w:val="{style}"/>{FIXED_24PT_SPACING}</w:pPr>'
             f"{_run_xml(block.text, bold=True, size_half_points=size)}"
             "</w:p>"
         )
     if block.kind == "bullet":
         return (
             "<w:p>"
-            '<w:pPr><w:pStyle w:val="ListParagraph"/><w:ind w:left="420" w:hanging="210"/></w:pPr>'
+            f'<w:pPr><w:pStyle w:val="ListParagraph"/><w:ind w:left="420" w:hanging="210"/>{FIXED_24PT_SPACING}</w:pPr>'
             f"{_run_xml('• ' + block.text)}"
             "</w:p>"
         )
     if block.kind == "quote":
         return (
             "<w:p>"
-            '<w:pPr><w:pStyle w:val="Quote"/><w:ind w:left="360"/></w:pPr>'
+            f'<w:pPr><w:pStyle w:val="Quote"/><w:ind w:left="360"/>{FIXED_24PT_SPACING}</w:pPr>'
             f"{_run_xml(block.text, size_half_points=22)}"
             "</w:p>"
         )
     if block.kind == "code":
         return (
             "<w:p>"
-            '<w:pPr><w:pStyle w:val="Code"/></w:pPr>'
+            f'<w:pPr><w:pStyle w:val="Code"/>{FIXED_24PT_SPACING}</w:pPr>'
             f"{_run_xml(block.text, size_half_points=20)}"
             "</w:p>"
         )
     return (
         "<w:p>"
-        '<w:pPr><w:spacing w:after="120"/><w:jc w:val="both"/></w:pPr>'
+        f'<w:pPr>{FIXED_24PT_SPACING}<w:jc w:val="both"/></w:pPr>'
         f"{_run_xml(block.text)}"
         "</w:p>"
     )
@@ -222,21 +225,22 @@ def styles_xml() -> str:
 <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
   <w:style w:type="paragraph" w:default="1" w:styleId="Normal">
     <w:name w:val="Normal"/>
+    <w:pPr><w:spacing w:line="480" w:lineRule="exact" w:before="0" w:after="0"/></w:pPr>
     <w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="Heading1">
     <w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/>
-    <w:pPr><w:keepNext/><w:spacing w:before="240" w:after="120"/></w:pPr>
+    <w:pPr><w:keepNext/><w:spacing w:line="480" w:lineRule="exact" w:before="0" w:after="0"/></w:pPr>
     <w:rPr><w:b/><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="Heading2">
     <w:name w:val="heading 2"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/>
-    <w:pPr><w:keepNext/><w:spacing w:before="200" w:after="100"/></w:pPr>
+    <w:pPr><w:keepNext/><w:spacing w:line="480" w:lineRule="exact" w:before="0" w:after="0"/></w:pPr>
     <w:rPr><w:b/><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="Heading3">
     <w:name w:val="heading 3"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/>
-    <w:pPr><w:keepNext/><w:spacing w:before="160" w:after="80"/></w:pPr>
+    <w:pPr><w:keepNext/><w:spacing w:line="480" w:lineRule="exact" w:before="0" w:after="0"/></w:pPr>
     <w:rPr><w:b/><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="ListParagraph"><w:name w:val="List Paragraph"/><w:basedOn w:val="Normal"/></w:style>
@@ -376,7 +380,15 @@ def _table_xml(table: DocxTable) -> str:
 def _appendix_xml(tables: list[DocxTable]) -> str:
     if not tables:
         return ""
-    parts = [_paragraph_xml(MarkdownBlock("heading", "附录：论文表格（供排版插入正文）", 1))]
+    parts = [
+        _paragraph_xml(MarkdownBlock("heading", "附录：核心表格摘录（供排版插入正文）", 1)),
+        _paragraph_xml(
+            MarkdownBlock(
+                "quote",
+                "本 Word 初稿仅展示部分核心表格，避免文末附表过长；完整表1—15的 CSV/TEX 文件保留在 outputs/tables/，可按终稿篇幅需要另行插入。",
+            )
+        ),
+    ]
     for table in tables:
         parts.append(_paragraph_xml(MarkdownBlock("heading", table.title, 2)))
         if table.note:
@@ -391,7 +403,8 @@ def _figure_appendix_xml(figures: list[DocxFigure]) -> str:
         return ""
     parts = [_paragraph_xml(MarkdownBlock("heading", "附录：图件清单（供排版插入正文）", 1))]
     for figure in figures:
-        title = f"{figure.figure_id} {figure.caption_cn}".strip()
+        figure_label = re.sub(r"^Figure\s+(\d+)$", r"图\1", figure.figure_id)
+        title = f"{figure_label}  {figure.caption_cn}".strip()
         parts.append(_paragraph_xml(MarkdownBlock("heading", title, 2)))
         parts.append(_paragraph_xml(MarkdownBlock("paragraph", f"文件：outputs/figures/{figure.filename}")))
         if figure.png_filename:
@@ -399,7 +412,7 @@ def _figure_appendix_xml(figures: list[DocxFigure]) -> str:
         if figure.jpg_filename:
             parts.append(_paragraph_xml(MarkdownBlock("paragraph", f"JPG：outputs/figures/{figure.jpg_filename}")))
         if figure.caption_en:
-            parts.append(_paragraph_xml(MarkdownBlock("paragraph", f"English caption: {figure.caption_en}")))
+            parts.append(_paragraph_xml(MarkdownBlock("paragraph", f"英文图题：{figure.caption_en}")))
         if figure.caveat:
             parts.append(_paragraph_xml(MarkdownBlock("quote", f"使用边界：{figure.caveat}")))
         if figure.source:

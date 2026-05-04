@@ -16,8 +16,8 @@ import matplotlib
 
 matplotlib.use("Agg")
 
+import matplotlib.patches as patches
 import matplotlib.pyplot as plt
-from matplotlib import font_manager
 import pandas as pd
 
 from stat_modeling.config import FIGURES_DIR
@@ -25,6 +25,7 @@ from stat_modeling.config import INTERIM_DATA_DIR
 from stat_modeling.config import TABLES_DIR
 from stat_modeling.config import ensure_project_directories
 from stat_modeling.delivery.figure_formats import save_figure_with_rasters
+from stat_modeling.delivery.figure_style import configure_paper_figure_style
 
 
 DEFAULT_MODELING_PANEL = INTERIM_DATA_DIR / "modeling" / "modeling_candidate_panel_2019_2023.csv"
@@ -41,16 +42,16 @@ DEFAULT_TABLE_15_CSV = TABLES_DIR / "table_15_variable_correlation_matrix.csv"
 DEFAULT_TABLE_15_TEX = TABLES_DIR / "table_15_variable_correlation_matrix.tex"
 
 CORRELATION_VARIABLES = {
-    "co2_emission_intensity": "Carbon intensity",
-    "co2_emission_total": "Total emissions",
-    "digital_inclusive_finance_index": "Digital finance",
-    "dfi_coverage_breadth": "Coverage breadth",
-    "dfi_usage_depth": "Usage depth",
-    "dfi_digitization_level": "Digitization level",
+    "co2_emission_intensity": "碳排放强度",
+    "co2_emission_total": "碳排放总量",
+    "digital_inclusive_finance_index": "数字普惠金融",
+    "dfi_coverage_breadth": "覆盖广度",
+    "dfi_usage_depth": "使用深度",
+    "dfi_digitization_level": "数字化程度",
     "gdp_total": "GDP",
-    "secondary_industry_share": "Secondary industry",
-    "fiscal_expenditure": "Fiscal expenditure",
-    "population_control_candidate": "Population candidate",
+    "secondary_industry_share": "第二产业占比",
+    "fiscal_expenditure": "财政支出",
+    "population_control_candidate": "人口候选变量",
 }
 
 
@@ -69,21 +70,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def configure_style() -> None:
-    available_fonts = {font.name for font in font_manager.fontManager.ttflist}
-    serif_font = "Times New Roman" if "Times New Roman" in available_fonts else "DejaVu Sans"
-    plt.rcParams.update(
-        {
-            "figure.dpi": 150,
-            "savefig.dpi": 300,
-            "font.family": [serif_font],
-            "axes.spines.top": False,
-            "axes.spines.right": False,
-            "axes.grid": True,
-            "grid.alpha": 0.25,
-            "pdf.fonttype": 42,
-            "ps.fonttype": 42,
-        }
-    )
+    configure_paper_figure_style()
 
 
 def require_columns(frame: pd.DataFrame, required_columns: Iterable[str], source: Path) -> None:
@@ -211,15 +198,15 @@ def export_sample_coverage_figure(dml_input: pd.DataFrame, output_dir: Path) -> 
         .sort_values("year")
     )
     fig, axes = plt.subplots(ncols=2, figsize=(8.6, 3.8))
-    fig.suptitle("DML sample coverage by year", fontsize=13)
+    fig.suptitle("DML 样本年度覆盖情况", fontsize=13)
     axes[0].bar(coverage["year"].astype(str), coverage["city_year_obs"], color="#6b6b6b")
-    axes[0].set_title("City-year observations")
-    axes[0].set_xlabel("Year")
-    axes[0].set_ylabel("Obs.")
+    axes[0].set_title("城市—年份观测数")
+    axes[0].set_xlabel("年份")
+    axes[0].set_ylabel("观测数")
     axes[1].bar(coverage["year"].astype(str), coverage["cities"], color="#2f5597")
-    axes[1].set_title("Cities covered")
-    axes[1].set_xlabel("Year")
-    axes[1].set_ylabel("Cities")
+    axes[1].set_title("覆盖城市数")
+    axes[1].set_xlabel("年份")
+    axes[1].set_ylabel("城市数")
     return save_figure(fig, output_dir / "figure_07_sample_coverage_by_year.pdf")
 
 
@@ -235,7 +222,7 @@ def build_robustness_rows(
         row = main.iloc[0]
         rows.append(
             {
-                "label": "DML main",
+                "label": "DML 主规格",
                 "estimate": row["ate"],
                 "ci_lower": row["ci_lower"],
                 "ci_upper": row["ci_upper"],
@@ -248,7 +235,7 @@ def build_robustness_rows(
         row = ols.iloc[0]
         rows.append(
             {
-                "label": "OLS TWFE",
+                "label": "OLS 双向固定效应",
                 "estimate": row["coefficient"],
                 "ci_lower": row["ci_lower"],
                 "ci_upper": row["ci_upper"],
@@ -259,7 +246,10 @@ def build_robustness_rows(
     for _, row in table_08.iterrows():
         rows.append(
             {
-                "label": str(row["learner_label"]).replace(" replacement", ""),
+                "label": str(row["learner_label"])
+                .replace("GradientBoosting baseline", "GBDT 基准学习器")
+                .replace("RandomForest replacement", "随机森林替换")
+                .replace("ExtraTrees replacement", "极端随机树替换"),
                 "estimate": row["ate"],
                 "ci_lower": row["ci_lower"],
                 "ci_upper": row["ci_upper"],
@@ -272,7 +262,7 @@ def build_robustness_rows(
         row = pop.iloc[0]
         rows.append(
             {
-                "label": "DML + population",
+                "label": "DML + 人口变量",
                 "estimate": row["ate"],
                 "ci_lower": row["ci_lower"],
                 "ci_upper": row["ci_upper"],
@@ -309,8 +299,8 @@ def export_robustness_forest_figure(robustness: pd.DataFrame, output_dir: Path) 
         )
         ax.text(row["ci_upper"] + 0.003, idx, f"p={row['p_value']:.3f}", va="center", fontsize=8)
     ax.set_yticks(list(y), ordered["label"].tolist())
-    ax.set_xlabel("Effect on carbon emission intensity")
-    ax.set_title("Robustness evidence ladder: intensity-scale estimates")
+    ax.set_xlabel("对碳排放强度的估计效应")
+    ax.set_title("稳健性证据森林图：强度口径估计")
     ax.grid(axis="x", alpha=0.25)
     return save_figure(fig, output_dir / "figure_08_robustness_evidence_forest.pdf")
 
@@ -320,8 +310,8 @@ def export_regional_trend_figure(dml_input: pd.DataFrame, cate_groups: pd.DataFr
     require_columns(cate_groups, ["pku_city_code", "region_group_cn"], DEFAULT_CATE_GROUPS)
     city_region = cate_groups[["pku_city_code", "region_group_cn"]].drop_duplicates("pku_city_code")
     merged = dml_input.merge(city_region, on="pku_city_code", how="left")
-    region_label_map = {"东部": "East", "中部": "Central", "西部": "West", "东北": "Northeast"}
-    merged["region_group_label"] = merged["region_group_cn"].map(region_label_map).fillna("Unclassified")
+    region_label_map = {"东部": "东部", "中部": "中部", "西部": "西部", "东北": "东北"}
+    merged["region_group_label"] = merged["region_group_cn"].map(region_label_map).fillna("未分类")
     trend = (
         merged.groupby(["year", "region_group_label"])[["digital_inclusive_finance_index", "co2_emission_intensity"]]
         .mean()
@@ -332,63 +322,77 @@ def export_regional_trend_figure(dml_input: pd.DataFrame, cate_groups: pd.DataFr
     for region, group in trend.groupby("region_group_label"):
         axes[0].plot(group["year"], group["digital_inclusive_finance_index"], marker="o", linewidth=1.4, label=region)
         axes[1].plot(group["year"], group["co2_emission_intensity"], marker="s", linewidth=1.4, label=region)
-    axes[0].set_title("Digital finance by region")
-    axes[0].set_ylabel("Mean index")
-    axes[1].set_title("Carbon intensity by region")
-    axes[1].set_ylabel("Mean intensity")
+    axes[0].set_title("分区域数字普惠金融指数")
+    axes[0].set_ylabel("均值")
+    axes[1].set_title("分区域碳排放强度")
+    axes[1].set_ylabel("均值")
     for ax in axes:
-        ax.set_xlabel("Year")
+        ax.set_xlabel("年份")
         ax.set_xticks(sorted(trend["year"].unique().tolist()))
     axes[1].legend(frameon=False, fontsize=8, loc="best")
-    fig.suptitle("Regional descriptive trends", fontsize=13)
+    fig.suptitle("区域描述性趋势", fontsize=13)
     return save_figure(fig, output_dir / "figure_09_regional_descriptive_trends.pdf")
 
 
 def export_research_framework_figure(output_dir: Path) -> dict[str, Path]:
-    """Export a paper-facing technical-route figure.
+    """Export a detailed paper-facing technical-route figure."""
 
-    The figure is deliberately design-only: it summarizes the already approved
-    empirical pipeline and does not introduce new variables, estimators, or
-    robustness checks. Labels are in English so the asset renders reliably even
-    on machines without Chinese fonts.
-    """
-
-    steps = [
+    columns = [
         {
-            "title": "Data integration",
-            "body": "PKU DFIIC + CMCC carbon\n+ core city controls\n2019-2023 city panel",
+            "title": "数据层",
             "color": "#d9eaf7",
+            "items": [
+                "PKU 数字普惠金融指数\n总指数 + 分项指数",
+                "CMCC 城市碳排放\n总量与强度口径",
+                "核心控制变量\nGDP / 第二产业 / 财政支出",
+            ],
         },
         {
-            "title": "Main identification",
-            "body": "Partial-linear DML\nGroup cross-fitting\nCity-clustered SE",
+            "title": "样本构造",
+            "color": "#eaf4ff",
+            "items": [
+                "城市代码 + 年份匹配\n统一地级市面板键",
+                "缺失与口径检查\n保留主分析可用观测",
+                "2019—2023 年\n294 城 / 1456 城市—年份",
+            ],
+        },
+        {
+            "title": "DML 主识别",
             "color": "#e2f0d9",
+            "items": [
+                "设定：Y=θD+g(X)+U\nD=m(X)+V",
+                "GBDT 拟合干扰函数\n城市分组 5 折交叉拟合",
+                "残差正交化估计 θ\n城市聚类标准误",
+            ],
         },
         {
-            "title": "Robustness",
-            "body": "Outcome replacement\nTWFE benchmark\nPlacebo + learner checks\nPopulation sensitivity",
+            "title": "检验与输出",
             "color": "#fff2cc",
+            "items": [
+                "基准结果：ATE=-0.0540\n95% CI [-0.0951,-0.0130]",
+                "对比/稳健性\n总量替换 / TWFE / 安慰剂 / 学习器替换",
+                "敏感性边界\n加入人口变量后效应收缩",
+            ],
         },
         {
-            "title": "Heterogeneity",
-            "body": "Causal forest CATE\nRegion / development\n/ industry groups\nBootstrap diagnostics",
-            "color": "#fde9d9",
-        },
-        {
-            "title": "Policy text module",
-            "body": "Document registry\nRule proxy scoring\nLLM readiness gate\nMethod appendix until validated",
+            "title": "扩展分析",
             "color": "#eadcf8",
+            "items": [
+                "因果森林估计 CATE\n区域 / 经济发展 / 产业结构分组",
+                "Bootstrap 组间差异诊断\n支撑异质性线索",
+                "政策文本模块\n登记—规则代理—LLM 批处理—人工复核\n当前 readiness=not_ready",
+            ],
         },
     ]
 
-    fig, ax = plt.subplots(figsize=(12.5, 4.8))
+    fig, ax = plt.subplots(figsize=(14.5, 7.2))
     ax.set_axis_off()
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     ax.text(
         0.5,
-        0.95,
-        "Research framework: digital inclusive finance and urban carbon reduction",
+        0.965,
+        "研究框架与算法流程：数字普惠金融的城市碳减排效应识别",
         ha="center",
         va="center",
         fontsize=14,
@@ -396,51 +400,92 @@ def export_research_framework_figure(output_dir: Path) -> dict[str, Path]:
     )
     ax.text(
         0.5,
-        0.885,
-        "Evidence chain aligned with the approved main specification; policy-text scoring remains a readiness-gated module.",
+        0.925,
+        "主线保持 DML 因果效应估计，辅线通过稳健性、异质性和政策文本模块增强解释力；图中流程不改变既有研究设计。",
         ha="center",
         va="center",
         fontsize=9.5,
         color="#555555",
     )
 
-    box_width = 0.17
-    box_height = 0.46
-    y0 = 0.32
-    xs = [0.035, 0.235, 0.435, 0.635, 0.815]
-    for idx, (x0, step) in enumerate(zip(xs, steps, strict=True), start=1):
-        patch = plt.Rectangle((x0, y0), box_width, box_height, facecolor=step["color"], edgecolor="#555555", linewidth=1.2)
-        ax.add_patch(patch)
+    box_width = 0.162
+    x_positions = [0.035, 0.238, 0.441, 0.644, 0.807]
+    title_y = 0.83
+    item_ys = [0.69, 0.51, 0.33]
+    for idx, (x0, column) in enumerate(zip(x_positions, columns, strict=True), start=1):
+        header = patches.FancyBboxPatch(
+            (x0, title_y - 0.055),
+            box_width,
+            0.085,
+            boxstyle="round,pad=0.006,rounding_size=0.012",
+            facecolor=column["color"],
+            edgecolor="#555555",
+            linewidth=1.1,
+        )
+        ax.add_patch(header)
         ax.text(
             x0 + box_width / 2,
-            y0 + box_height - 0.065,
-            f"{idx}. {step['title']}",
+            title_y - 0.012,
+            f"{idx}. {column['title']}",
             ha="center",
             va="center",
-            fontsize=10,
+            fontsize=10.5,
             fontweight="bold",
         )
-        ax.text(
-            x0 + box_width / 2,
-            y0 + box_height / 2 - 0.02,
-            step["body"],
-            ha="center",
-            va="center",
-            fontsize=8.5,
-            linespacing=1.35,
-        )
-        if idx < len(steps):
+
+        for item_y, item in zip(item_ys, column["items"], strict=True):
+            item_box = patches.FancyBboxPatch(
+                (x0, item_y - 0.075),
+                box_width,
+                0.125,
+                boxstyle="round,pad=0.008,rounding_size=0.008",
+                facecolor="white",
+                edgecolor="#888888",
+                linewidth=0.9,
+            )
+            ax.add_patch(item_box)
+            ax.text(
+                x0 + box_width / 2,
+                item_y - 0.012,
+                item,
+                ha="center",
+                va="center",
+                fontsize=8.1,
+                linespacing=1.28,
+            )
+
+        if idx < len(columns):
             ax.annotate(
                 "",
-                xy=(x0 + box_width + 0.025, y0 + box_height / 2),
-                xytext=(x0 + box_width + 0.005, y0 + box_height / 2),
+                xy=(x0 + box_width + 0.032, 0.51),
+                xytext=(x0 + box_width + 0.008, 0.51),
                 arrowprops=dict(arrowstyle="->", linewidth=1.3, color="#555555"),
             )
 
+    ax.annotate(
+        "主识别路径",
+        xy=(0.55, 0.885),
+        xytext=(0.28, 0.885),
+        ha="center",
+        va="center",
+        fontsize=8.8,
+        arrowprops=dict(arrowstyle="->", linewidth=1.1, color="#2f5597"),
+        color="#2f5597",
+    )
+    ax.annotate(
+        "解释与验证路径",
+        xy=(0.91, 0.20),
+        xytext=(0.52, 0.20),
+        ha="center",
+        va="center",
+        fontsize=8.8,
+        arrowprops=dict(arrowstyle="->", linewidth=1.1, color="#7f6000"),
+        color="#7f6000",
+    )
     ax.text(
         0.5,
-        0.16,
-        "Reporting boundary: DML evidence is conditional on observed controls; population sensitivity and LLM not-ready status must remain disclosed.",
+        0.095,
+        "报告边界：DML 证据依赖可观测控制条件；人口变量敏感性和政策文本 LLM 未验证状态必须在正文或附录披露。",
         ha="center",
         va="center",
         fontsize=9,

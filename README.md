@@ -129,7 +129,7 @@ To export only the Word draft without rebuilding the full package:
 python3 src/33_export_submission_docx.py
 ```
 
-Use `--no-table-appendix` and/or `--no-figure-appendix` if you need a body-only DOCX. The default DOCX appends the current Table 1–15 CSV outputs and a Figure 1–9 insertion checklist at the end so tables and PDF/PNG/JPG figures can be moved into 正文 during Word/WPS editing. Follow `docs/paper/final-editing-guide.md` for recommended 正文/技术附录 placement and the required cautionary boundaries.
+Use `--no-table-appendix` and/or `--no-figure-appendix` if you need a body-only DOCX. The default DOCX now appends only a compact core-table excerpt (表1、表2、表7、表10、表11、表14) plus a Figure 1–10 insertion checklist; the complete 表1—15 CSV/TEX outputs remain in `outputs/tables/` for on-demand Word/WPS insertion. Follow `docs/paper/final-editing-guide.md` for recommended 正文/技术附录 placement and the required cautionary boundaries.
 
 Optional derived/interim modeling data can be copied with:
 

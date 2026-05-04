@@ -20,7 +20,7 @@
 
 - [ ] 将 `docs/paper/04_submission_manuscript_candidate.md` 转成 Word 正式稿，并由参赛队人工审阅、改写和确认正文表述。
 - [x] 建立最终 Word 编辑指南：`docs/paper/final-editing-guide.md`（规定正文/附录表图放置、编辑顺序和不可过度宣称边界）。
-- [x] 生成本地 Word 初稿：`python3 src/33_export_submission_docx.py`（默认追加 Table 1–15 表格附录和 Figure 1–10 图件清单，图件同时提供 PDF/PNG/JPG，供 Word/WPS 内移动到正文）。
+- [x] 生成本地 Word 初稿：`python3 src/33_export_submission_docx.py`（默认仅追加核心表格摘录：表1、表2、表7、表10、表11、表14；完整表1—15保留在 `outputs/tables/`；同时追加图1—10图件清单，图件提供 PDF/PNG/JPG，供 Word/WPS 内移动到正文）。
 - [ ] 统一标题、摘要、关键词、一级/二级标题格式。
 - [x] 完成往届优秀论文写作风格审读备忘录：`docs/paper/06_prior_winner_style_review.md`。
 - [x] 新增研究框架与技术路线图 Figure 10，便于对齐获奖论文常见“研究思路/框架结构”写法。
@@ -58,7 +58,7 @@
 - [ ] 准备 `data/processed/` 或最小可复现输入表，避免提交过大的中间文件。
 - [ ] 补充数据来源说明：PKU 指数、CMCC、控制变量来源。
 - [x] 使用 `python3 src/32_prepare_submission_package.py` 生成本地提交包；默认不复制 `data/raw/`。
-- [x] 本地提交包自动包含 `paper/final-editing-guide.md`、`paper/05_materials_and_adversarial_review.md` 和 `paper/04_submission_manuscript_candidate.docx`，DOCX 文末附带当前表格附录与图件清单。
+- [x] 本地提交包自动包含 `paper/final-editing-guide.md`、`paper/05_materials_and_adversarial_review.md` 和 `paper/04_submission_manuscript_candidate.docx`，DOCX 文末仅附核心表格摘录与图件清单；完整表格在提交包 `outputs/tables/` 中保留。
 - [ ] 若确认派生数据可提交，再使用 `python3 src/32_prepare_submission_package.py --include-derived-data` 生成含派生数据版本。
 - [x] 运行完整测试：`python3 -m pytest -q`（2026-05-04，95 passed）。
 - [x] 运行语法检查：`python3 -m py_compile $(find src tests -name '*.py' | sort)`（2026-05-04，exit 0）。

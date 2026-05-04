@@ -68,4 +68,4 @@ def test_prepare_submission_package_allows_missing_and_excludes_raw_data(tmp_pat
     assert "final-editing-guide.md" in manifest
     assert "政策文本 LLM 模块当前 `not_ready`" in manifest
     assert "附录：图件清单" in document_xml
-    assert "Figure 1 趋势图" in document_xml
+    assert "图1  趋势图" in document_xml

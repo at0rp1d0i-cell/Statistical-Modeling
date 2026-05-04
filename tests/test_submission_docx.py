@@ -17,7 +17,7 @@ def test_submission_docx_loads_existing_tables_only(tmp_path):
     tables = load_submission_tables(tables_dir)
 
     assert len(tables) == 1
-    assert tables[0].title.startswith("Table 1")
+    assert tables[0].title.startswith("表1")
     assert tables[0].rows[1] == ("Y", "1.0")
 
 
@@ -45,10 +45,11 @@ def test_export_submission_docx_includes_table_appendix(tmp_path):
         document_xml = archive.read("word/document.xml").decode("utf-8")
 
     assert "投稿候选稿" in document_xml
-    assert "附录：论文表格" in document_xml
+    assert "附录：核心表格摘录" in document_xml
     assert "附录：图件清单" in document_xml
-    assert "Table 1 描述性统计" in document_xml
-    assert "Figure 1 趋势图" in document_xml
+    assert "仅展示部分核心表格" in document_xml
+    assert "表1  描述性统计" in document_xml
+    assert "图1  趋势图" in document_xml
     assert "outputs/figures/figure_01.png" in document_xml
     assert "outputs/figures/figure_01.jpg" in document_xml
     assert "Y" in document_xml

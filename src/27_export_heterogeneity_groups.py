@@ -7,7 +7,6 @@ import matplotlib
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
-from matplotlib import font_manager
 import pandas as pd
 
 from stat_modeling.config import FIGURES_DIR
@@ -15,6 +14,7 @@ from stat_modeling.config import INTERIM_DATA_DIR
 from stat_modeling.config import TABLES_DIR
 from stat_modeling.config import ensure_project_directories
 from stat_modeling.delivery.figure_formats import save_figure_with_rasters
+from stat_modeling.delivery.figure_style import configure_paper_figure_style
 from stat_modeling.data.io import write_table
 from stat_modeling.modeling.heterogeneity_groups import build_heterogeneity_group_summary
 
@@ -25,23 +25,6 @@ DEFAULT_OUTPUT_CSV = TABLES_DIR / "table_10_heterogeneity_group_summary.csv"
 DEFAULT_OUTPUT_TEX = TABLES_DIR / "table_10_heterogeneity_group_summary.tex"
 DEFAULT_ATTACHED_CSV = INTERIM_DATA_DIR / "modeling" / "heterogeneity_candidate_cate_with_groups.csv"
 DEFAULT_FIGURE_PATH = FIGURES_DIR / "figure_06_heterogeneity_groups.pdf"
-
-DIMENSION_EN = {
-    "区域": "Region",
-    "经济发展水平": "Economic development",
-    "产业结构": "Industrial structure",
-}
-GROUP_EN = {
-    "东部": "East",
-    "中部": "Central",
-    "西部": "West",
-    "东北": "Northeast",
-    "高经济发展水平": "High GDP",
-    "低经济发展水平": "Low GDP",
-    "高第二产业占比": "High secondary share",
-    "低第二产业占比": "Low secondary share",
-}
-
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Export formal heterogeneity group summaries from candidate CATE output.")
@@ -55,21 +38,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def configure_style() -> None:
-    available_fonts = {font.name for font in font_manager.fontManager.ttflist}
-    serif_font = "Times New Roman" if "Times New Roman" in available_fonts else "DejaVu Sans"
-    plt.rcParams.update(
-        {
-            "figure.dpi": 150,
-            "savefig.dpi": 300,
-            "font.family": [serif_font],
-            "axes.spines.top": False,
-            "axes.spines.right": False,
-            "axes.grid": True,
-            "grid.alpha": 0.25,
-            "pdf.fonttype": 42,
-            "ps.fonttype": 42,
-        }
-    )
+    configure_paper_figure_style()
 
 
 def format_latex_table(summary: pd.DataFrame) -> str:
@@ -112,10 +81,7 @@ def format_latex_table(summary: pd.DataFrame) -> str:
 def export_group_figure(summary: pd.DataFrame, figure_path: Path) -> Path:
     figure_path.parent.mkdir(parents=True, exist_ok=True)
     plot = summary.copy()
-    plot["label_en"] = plot.apply(
-        lambda row: f"{DIMENSION_EN.get(row['dimension_cn'], row['dimension_cn'])}: {GROUP_EN.get(row['group_cn'], row['group_cn'])}",
-        axis=1,
-    )
+    plot["label_cn"] = plot.apply(lambda row: f"{row['dimension_cn']}：{row['group_cn']}", axis=1)
     y_positions = list(range(len(plot)))
     x = plot["cate_mean"].astype(float)
     xerr_lower = x - plot["cate_mean_ci_lower_approx"].astype(float)
@@ -133,14 +99,14 @@ def export_group_figure(summary: pd.DataFrame, figure_path: Path) -> Path:
     )
     ax.axvline(0, color="#444444", linestyle="--", linewidth=1)
     ax.set_yticks(y_positions)
-    ax.set_yticklabels(plot["label_en"].tolist())
+    ax.set_yticklabels(plot["label_cn"].tolist())
     ax.invert_yaxis()
-    ax.set_xlabel("Group mean CATE and approximate 95% interval")
-    ax.set_title("Heterogeneity group summaries")
+    ax.set_xlabel("分组平均 CATE 及近似 95% 区间")
+    ax.set_title("异质性分组摘要")
     ax.text(
         0.0,
         -0.12,
-        "Note: intervals summarize current candidate CATE estimates; not a subgroup significance test.",
+        "注：区间来自当前候选 CATE 估计摘要，不等同于分组显著性检验。",
         transform=ax.transAxes,
         ha="left",
         va="top",

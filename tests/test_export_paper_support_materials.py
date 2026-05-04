@@ -123,4 +123,4 @@ def test_export_paper_support_materials_runs_with_explicit_inputs(tmp_path):
     sample_table = pd.read_csv(tables_dir / "table_14_sample_construction_coverage.csv")
     assert "最终 DML 输入样本" in sample_table["stage_cn"].tolist()
     correlation_table = pd.read_csv(tables_dir / "table_15_variable_correlation_matrix.csv")
-    assert "Digital finance" in correlation_table.columns
+    assert "数字普惠金融" in correlation_table.columns

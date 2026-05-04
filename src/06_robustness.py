@@ -22,6 +22,7 @@ from stat_modeling.config import RANDOM_SEED
 from stat_modeling.config import TABLES_DIR
 from stat_modeling.config import ensure_project_directories
 from stat_modeling.delivery.figure_formats import save_figure_with_rasters
+from stat_modeling.delivery.figure_style import configure_paper_figure_style
 from stat_modeling.data.io import read_table
 from stat_modeling.data.io import write_table
 from stat_modeling.modeling.dml import DMLResult
@@ -419,20 +420,21 @@ def format_placebo_summary_latex(summary_table: pd.DataFrame) -> str:
 
 
 def save_placebo_figure(distribution: pd.DataFrame, summary: PlaceboSummary, output_path: Path) -> Path:
+    configure_paper_figure_style()
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fig, ax = plt.subplots(figsize=(7.2, 4.2))
     ax.hist(distribution["placebo_ate"], bins=30, color="#9e9e9e", edgecolor="white")
-    ax.axvline(summary.true_ate, color="#2f5597", linestyle="-", linewidth=1.8, label=f"True ATE = {summary.true_ate:.4f}")
-    ax.axvline(-abs(summary.true_ate), color="#2f5597", linestyle=":", linewidth=1.2, label="|True ATE| thresholds")
+    ax.axvline(summary.true_ate, color="#2f5597", linestyle="-", linewidth=1.8, label=f"真实 ATE = {summary.true_ate:.4f}")
+    ax.axvline(-abs(summary.true_ate), color="#2f5597", linestyle=":", linewidth=1.2, label="|真实 ATE| 阈值")
     ax.axvline(abs(summary.true_ate), color="#2f5597", linestyle=":", linewidth=1.2)
     ax.axvline(0, color="#444444", linestyle="--", linewidth=1)
-    ax.set_title("DML residual-permutation placebo distribution")
-    ax.set_xlabel("Placebo ATE")
-    ax.set_ylabel("Frequency")
+    ax.set_title("DML 残差置换安慰剂检验分布")
+    ax.set_xlabel("安慰剂 ATE")
+    ax.set_ylabel("频数")
     ax.text(
         0.98,
         0.95,
-        f"Permutation p = {summary.empirical_p_value:.4f}\nN = {summary.permutations}",
+        f"置换 p 值 = {summary.empirical_p_value:.4f}\n置换次数 = {summary.permutations}",
         transform=ax.transAxes,
         ha="right",
         va="top",

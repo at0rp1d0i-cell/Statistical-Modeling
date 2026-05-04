@@ -59,7 +59,8 @@ def test_export_markdown_to_docx_can_append_tables(tmp_path):
     with zipfile.ZipFile(output) as archive:
         document_xml = archive.read("word/document.xml").decode("utf-8")
 
-    assert "附录：论文表格" in document_xml
+    assert "附录：核心表格摘录" in document_xml
+    assert "仅展示部分核心表格" in document_xml
     assert "Table 1 测试表" in document_xml
     assert "变量" in document_xml
     assert "1.23" in document_xml
@@ -88,7 +89,7 @@ def test_export_markdown_to_docx_can_append_figure_list(tmp_path):
         document_xml = archive.read("word/document.xml").decode("utf-8")
 
     assert "附录：图件清单" in document_xml
-    assert "Figure 1 趋势图" in document_xml
+    assert "图1  趋势图" in document_xml
     assert "outputs/figures/figure_01.pdf" in document_xml
     assert "outputs/figures/figure_01.png" in document_xml
     assert "outputs/figures/figure_01.jpg" in document_xml

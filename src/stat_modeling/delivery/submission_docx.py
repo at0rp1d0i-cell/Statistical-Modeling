@@ -25,23 +25,19 @@ class SubmissionTableSpec:
     note: str = ""
 
 
-DEFAULT_TABLE_SPECS = (
-    SubmissionTableSpec("Table 1 描述性统计", "table_01_descriptive_statistics.csv"),
-    SubmissionTableSpec("Table 2 DML 主结果与替换结果变量", "table_02_dml_main_and_robustness.csv"),
-    SubmissionTableSpec("Table 3 CATE 技术摘要", "table_03_heterogeneity_candidate_summary.csv"),
-    SubmissionTableSpec("Table 4 CATE 城市极值诊断", "table_04_heterogeneity_candidate_city_extremes.csv"),
-    SubmissionTableSpec("Table 5 政策文本 seed 机制候选", "table_05_policy_seed_mechanism_candidate.csv", "技术附录候选；非最终 LLM 机制证据。"),
-    SubmissionTableSpec("Table 6 OLS 双向固定效应对照", "table_06_ols_twfe_candidate.csv"),
-    SubmissionTableSpec("Table 7 DML 安慰剂检验摘要", "table_07_dml_placebo_candidate_summary.csv"),
-    SubmissionTableSpec("Table 8 DML 学习器替换检验", "table_08_dml_learner_replacement_candidate.csv"),
-    SubmissionTableSpec("Table 9 当前证据链汇总", "table_09_current_evidence_synthesis.csv", "写作/答辩汇总表，不替代模型结果表。"),
-    SubmissionTableSpec("Table 10 异质性分组摘要", "table_10_heterogeneity_group_summary.csv"),
-    SubmissionTableSpec("Table 11 人口变量敏感性", "table_11_population_sensitivity_robustness.csv"),
-    SubmissionTableSpec("Table 12 异质性组间差异诊断", "table_12_heterogeneity_group_differences.csv"),
-    SubmissionTableSpec("Table 13 政策文本 LLM 验证就绪度", "table_13_policy_llm_validation_readiness.csv", "当前 not_ready；只能作为验证边界说明。"),
-    SubmissionTableSpec("Table 14 样本构造与覆盖情况", "table_14_sample_construction_coverage.csv", "数据可信度支撑表；不改变主规格。"),
-    SubmissionTableSpec("Table 15 主要变量相关系数矩阵", "table_15_variable_correlation_matrix.csv", "描述性关系和多重共线性初筛；不是因果证据。"),
+DOCX_CORE_TABLE_SPECS = (
+    SubmissionTableSpec("表1  描述性统计", "table_01_descriptive_statistics.csv"),
+    SubmissionTableSpec("表2  DML 主结果与替换结果变量", "table_02_dml_main_and_robustness.csv"),
+    SubmissionTableSpec("表7  DML 安慰剂检验摘要", "table_07_dml_placebo_candidate_summary.csv"),
+    SubmissionTableSpec("表10  异质性分组摘要", "table_10_heterogeneity_group_summary.csv"),
+    SubmissionTableSpec("表11  人口变量敏感性", "table_11_population_sensitivity_robustness.csv"),
+    SubmissionTableSpec("表14  样本构造与覆盖情况", "table_14_sample_construction_coverage.csv", "数据可信度支撑表；不改变主规格。"),
 )
+
+# Default DOCX only attaches a compact set of core tables. The complete Table
+# 1–15 CSV/TEX assets remain in outputs/tables and in the submission package for
+# on-demand insertion during final Word/WPS editing.
+DEFAULT_TABLE_SPECS = DOCX_CORE_TABLE_SPECS
 
 FALLBACK_FIGURE_SPECS = (
     {

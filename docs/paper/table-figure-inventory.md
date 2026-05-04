@@ -9,7 +9,7 @@
 | Manuscript v0.1 | `docs/paper/02_manuscript_v0_1.md` | 技术初稿完成，题目已确认数字普惠金融主线 | 可作为正文扩写底稿；最终定稿前需随人口稳健性、正式异质性和政策文本 validated LLM 结果更新 |
 | Manuscript v0.2 | `docs/paper/03_manuscript_v0_2.md` | 可评审完整初稿完成 | 当前最完整正文底稿；可用于内部评审、答辩结构演练和后续格式化，正式提交前仍需补齐参考文献格式、表图排版和 AI 使用说明 |
 | Submission candidate | `docs/paper/04_submission_manuscript_candidate.md` | 投稿候选稿完成 | 从 v0.2 整理而来，去除内部复现命令和表图清单，补入候选参考文献；用于转 Word、人工改写、查重和最终排版 |
-| Submission DOCX | `dist/04_submission_manuscript_candidate.docx` | 本地生成 | 由 `src/33_export_submission_docx.py` 生成；默认将当前 Table 1–15 CSV 和 Figure 1–9 插图清单追加为文末附录，图件提供 PDF/PNG/JPG，供 Word/WPS 编辑时移动到正文 |
+| Submission DOCX | `dist/04_submission_manuscript_candidate.docx` | 本地生成 | 由 `src/33_export_submission_docx.py` 生成；默认仅将核心表格摘录（表1、表2、表7、表10、表11、表14）和图1—10插图清单追加为文末附录，完整表1—15仍保留在 `outputs/tables/` 供按需插入；图件提供 PDF/PNG/JPG，供 Word/WPS 编辑时移动到正文 |
 | Final editing guide | `docs/paper/final-editing-guide.md` | 终稿编辑指南完成 | 规定正文/附录表图放置、Word/WPS 编辑顺序、识别边界和提交前人工核对项；随提交包复制到 `paper/final-editing-guide.md` |
 | Materials review | `docs/paper/05_materials_and_adversarial_review.md` | 反向评估与素材清单完成 | 从评委质疑视角记录当前证据链软肋、新增支撑表图和下一轮增强方向 |
 
@@ -60,7 +60,7 @@
 
 ## 2026-05-04 本地重跑记录
 
-- 本轮针对论文支撑素材重跑 `src/34_export_paper_support_materials.py`，新增并验证 Figure 10；其余 Table 1–15 与 Figure 1–9 沿用前次完整重跑记录。
+- 本轮针对论文支撑素材重跑 `src/34_export_paper_support_materials.py`，新增并验证 Figure 10；其余表1—15与图1—9沿用前次完整重跑记录。
 - 生成物检查：`outputs/tables/table_01` 至 `table_15` 的当前合同文件均存在；所有 `table_*.tex` 均包含 `booktabs` 三线表结构。
 - 图件检查：`outputs/figures/figure_01` 至 `figure_10` 的当前合同 PDF/PNG/JPG 均存在；`figure_manifest.csv` 已生成并由 DOCX fallback 补入 Figure 5—10。
 - 注意：`outputs/` 默认被 `.gitignore` 忽略；若最终提交包需要包含表图成品，应单独打包或按最终提交策略 force-add。

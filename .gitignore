@@ -10,6 +10,7 @@ __pycache__/
 venv/
 env/
 .env
+.vscode/
 
 # Data and generated artifacts
 data/raw/*
@@ -35,3 +36,4 @@ data.zip
 # Local PDF reading / reference artifacts
 artifacts/
 /*.pdf
+/*.docx

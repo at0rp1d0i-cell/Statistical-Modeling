@@ -7,7 +7,6 @@ import matplotlib
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
-from matplotlib import font_manager
 import pandas as pd
 
 from stat_modeling.config import FIGURES_DIR
@@ -16,6 +15,7 @@ from stat_modeling.config import TABLES_DIR
 from stat_modeling.config import ensure_project_directories
 from stat_modeling.delivery.figure_formats import companion_figure_paths
 from stat_modeling.delivery.figure_formats import save_figure_with_rasters
+from stat_modeling.delivery.figure_style import configure_paper_figure_style
 
 
 DEFAULT_DML_TABLE = TABLES_DIR / "table_02_dml_main_and_robustness.csv"
@@ -26,17 +26,17 @@ DEFAULT_MANIFEST = FIGURES_DIR / "figure_manifest.csv"
 
 POLICY_SCORE_DISPLAY_COLUMNS = {
     "policy_strength_score": {
-        "label": "Policy strength",
+        "label": "政策强度",
         "preferred": "mean_policy_strength_city_year",
         "fallback": "sum_policy_strength_city_year",
     },
     "execution_clarity_score": {
-        "label": "Execution clarity",
+        "label": "执行明确性",
         "preferred": "mean_execution_clarity_city_year",
         "fallback": "mean_execution_clarity_city_year",
     },
     "digital_green_synergy_score": {
-        "label": "Digital-green synergy",
+        "label": "数字绿色协同度",
         "preferred": "mean_digital_green_synergy_city_year",
         "fallback": "mean_digital_green_synergy_city_year",
     },
@@ -55,21 +55,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def configure_style() -> None:
-    available_fonts = {font.name for font in font_manager.fontManager.ttflist}
-    serif_font = "Times New Roman" if "Times New Roman" in available_fonts else "DejaVu Sans"
-    plt.rcParams.update(
-        {
-            "figure.dpi": 150,
-            "savefig.dpi": 300,
-            "font.family": [serif_font],
-            "axes.spines.top": False,
-            "axes.spines.right": False,
-            "axes.grid": True,
-            "grid.alpha": 0.25,
-            "pdf.fonttype": 42,
-            "ps.fonttype": 42,
-        }
-    )
+    configure_paper_figure_style()
 
 
 def require_columns(frame: pd.DataFrame, required: list[str], source: Path) -> None:
@@ -128,18 +114,18 @@ def export_trend_figure(frame: pd.DataFrame, output_dir: Path, source_path: Path
         trend["digital_finance_index_2019_100"],
         marker="o",
         linewidth=1.8,
-        label="Digital inclusive finance (base=100)",
+        label="数字普惠金融指数（首年=100）",
     )
     ax.plot(
         trend.index,
         trend["carbon_intensity_2019_100"],
         marker="s",
         linewidth=1.8,
-        label="Carbon intensity (base=100)",
+        label="碳排放强度（首年=100）",
     )
-    ax.set_title("Digital finance and carbon intensity trends")
-    ax.set_xlabel("Year")
-    ax.set_ylabel("Index, first observed year = 100")
+    ax.set_title("数字普惠金融与碳排放强度年度趋势")
+    ax.set_xlabel("年份")
+    ax.set_ylabel("指数（首年=100）")
     ax.legend(frameon=False)
     ax.set_xticks(trend.index.tolist())
     path = save_figure(fig, output_dir / "figure_01_digital_finance_carbon_intensity_trends.pdf")
@@ -159,16 +145,12 @@ def export_dml_interval_figure(frame: pd.DataFrame, output_dir: Path, source_pat
     require_columns(frame, required, source_path)
     if frame.empty:
         raise ValueError(f"{source_path} has no rows for DML interval plotting")
-    labels = (
-        frame["outcome_label_en"]
-        if "outcome_label_en" in frame.columns
-        else frame.get("outcome_column", pd.Series([f"Outcome {idx + 1}" for idx in range(len(frame))]))
-    )
+    labels = frame["outcome_label_cn"] if "outcome_label_cn" in frame.columns else frame.get("outcome_column", pd.Series([f"结果 {idx + 1}" for idx in range(len(frame))]))
 
     fig, axes = plt.subplots(nrows=len(frame), ncols=1, figsize=(7.2, max(3.6, 2.5 * len(frame))))
     if len(frame) == 1:
         axes = [axes]
-    fig.suptitle("DML effect intervals (95% CI)", fontsize=13, y=0.99)
+    fig.suptitle("DML 估计效应及 95% 置信区间", fontsize=13, y=0.99)
     for ax, (_, row), label in zip(axes, frame.iterrows(), labels):
         ate = float(row["ate"])
         ci_lower = float(row["ci_lower"])
@@ -186,11 +168,11 @@ def export_dml_interval_figure(frame: pd.DataFrame, output_dir: Path, source_pat
         ax.axvline(0, color="#666666", linestyle="--", linewidth=1)
         ax.set_yticks([])
         ax.set_title(str(label))
-        ax.set_xlabel("Estimated effect in outcome units")
+        ax.set_xlabel("估计效应（结果变量原单位）")
         span = ci_upper - ci_lower
         padding = span * 0.08 if span else max(abs(ate) * 0.1, 0.01)
         ax.set_xlim(ci_lower - padding, max(0, ci_upper) + padding)
-        annotation = f"ATE = {ate:.4f}\n95% CI [{ci_lower:.4f}, {ci_upper:.4f}]\np = {p_value:.4f}"
+        annotation = f"ATE = {ate:.4f}\n95% 置信区间 [{ci_lower:.4f}, {ci_upper:.4f}]\np = {p_value:.4f}"
         ax.text(
             0.99,
             0.80,
@@ -221,11 +203,11 @@ def export_cate_distribution_figure(frame: pd.DataFrame, output_dir: Path, sourc
     bins = max(4, min(30, int(len(cate) ** 0.5)))
     fig, ax = plt.subplots(figsize=(7.2, 4.2))
     ax.hist(cate, bins=bins, color="#7f7f7f", edgecolor="white")
-    ax.axvline(cate.mean(), color="#2f5597", linestyle="--", linewidth=1.5, label=f"Mean = {cate.mean():.4f}")
+    ax.axvline(cate.mean(), color="#2f5597", linestyle="--", linewidth=1.5, label=f"均值 = {cate.mean():.4f}")
     ax.axvline(0, color="#444444", linestyle=":", linewidth=1)
-    ax.set_title("Candidate CATE distribution")
-    ax.set_xlabel("Estimated CATE")
-    ax.set_ylabel("Frequency")
+    ax.set_title("候选 CATE 分布")
+    ax.set_xlabel("估计 CATE")
+    ax.set_ylabel("频数")
     ax.legend(frameon=False)
     path = save_figure(fig, output_dir / "figure_03_candidate_cate_distribution.pdf")
     return {
@@ -266,31 +248,31 @@ def export_policy_seed_snapshot_figure(
     active_scores = trend[list(display_score_columns)].dropna(how="all")
 
     fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(8.2, 3.8), gridspec_kw={"width_ratios": [1.1, 1.4]})
-    fig.suptitle("Seed policy-text mechanism coverage snapshot", fontsize=13, y=1.02)
+    fig.suptitle("政策文本 seed 机制变量覆盖快照", fontsize=13, y=1.02)
 
     coverage_ax, score_ax = axes
     coverage_ax.bar(trend.index.astype(str), trend["policy_doc_count"].fillna(0), color="#7f7f7f")
-    coverage_ax.set_title("Seed document coverage")
-    coverage_ax.set_xlabel("Year")
-    coverage_ax.set_ylabel("Mean docs per city-year")
+    coverage_ax.set_title("Seed 政策文件覆盖")
+    coverage_ax.set_xlabel("年份")
+    coverage_ax.set_ylabel("城市—年份平均文件数")
     coverage_ax.tick_params(axis="x", rotation=0)
 
     if active_scores.empty:
-        score_ax.text(0.5, 0.5, "No non-missing seed policy scores", ha="center", va="center", transform=score_ax.transAxes)
+        score_ax.text(0.5, 0.5, "暂无非缺失 seed 政策分数", ha="center", va="center", transform=score_ax.transAxes)
         score_ax.set_axis_off()
     else:
         latest_active_year = active_scores.index.max()
         latest_scores = active_scores.loc[latest_active_year, list(display_score_columns)].rename(display_score_columns)
         score_ax.barh(latest_scores.index.tolist(), latest_scores.values, color=["#4c78a8", "#f58518", "#54a24b"])
-        score_ax.set_title(f"Active seed scores ({latest_active_year})")
-        score_ax.set_xlabel("Rule-proxy score")
+        score_ax.set_title(f"活跃 seed 分数（{latest_active_year}）")
+        score_ax.set_xlabel("规则代理分数")
         score_ax.set_xlim(0, max(5.0, float(latest_scores.max()) * 1.15))
         for idx, value in enumerate(latest_scores.values):
             score_ax.text(value + 0.05, idx, f"{value:.2f}", va="center", fontsize=8.5)
     fig.text(
         0.01,
         -0.02,
-        "Note: seed central-document rule proxy only; sparse coverage is expected and not a validated LLM trend.",
+        "注：当前仅为中央政策 seed 的规则代理分数，覆盖稀疏且不是已验证 LLM 趋势。",
         fontsize=8,
         color="#444444",
     )
