@@ -114,6 +114,7 @@ def test_export_paper_support_materials_runs_with_explicit_inputs(tmp_path):
         "figure_07_sample_coverage_by_year",
         "figure_08_robustness_evidence_forest",
         "figure_09_regional_descriptive_trends",
+        "figure_10_research_framework",
     ]:
         assert (figures_dir / f"{stem}.pdf").exists()
         assert (figures_dir / f"{stem}.png").exists()

@@ -20,10 +20,12 @@
 
 - [ ] 将 `docs/paper/04_submission_manuscript_candidate.md` 转成 Word 正式稿，并由参赛队人工审阅、改写和确认正文表述。
 - [x] 建立最终 Word 编辑指南：`docs/paper/final-editing-guide.md`（规定正文/附录表图放置、编辑顺序和不可过度宣称边界）。
-- [x] 生成本地 Word 初稿：`python3 src/33_export_submission_docx.py`（默认追加 Table 1–15 表格附录和 Figure 1–9 图件清单，图件同时提供 PDF/PNG/JPG，供 Word/WPS 内移动到正文）。
+- [x] 生成本地 Word 初稿：`python3 src/33_export_submission_docx.py`（默认追加 Table 1–15 表格附录和 Figure 1–10 图件清单，图件同时提供 PDF/PNG/JPG，供 Word/WPS 内移动到正文）。
 - [ ] 统一标题、摘要、关键词、一级/二级标题格式。
+- [x] 完成往届优秀论文写作风格审读备忘录：`docs/paper/06_prior_winner_style_review.md`。
+- [x] 新增研究框架与技术路线图 Figure 10，便于对齐获奖论文常见“研究思路/框架结构”写法。
 - [ ] 按 `docs/paper/final-editing-guide.md` 移动正文表图，并将正文表图编号与 `docs/paper/table-figure-inventory.md` 对齐。
-- [x] 当前放置建议已确认：正文优先 Table 1/2/6/7/8/10/11/12 与 Figure 1/2/5/6；技术附录放 Table 3/4/5/9/13 与 Figure 3/4。
+- [x] 当前放置建议已确认：正文优先 Table 1/2/6/7/8/10/11/12/14 与 Figure 10/1/2/5/6/7/8；技术附录放 Table 3/4/5/9/13/15 与 Figure 3/4/9。
 - [ ] 将 Table 9 定位为答辩/结论汇总，不替代模型结果表。
 - [ ] 补齐参考文献格式，至少覆盖 `docs/paper/references.md` 与 `docs/paper/references.bib` 中的核心文献。
 - [ ] 明确“DML 不能自动解决所有内生性”的识别边界。
@@ -46,8 +48,8 @@
   python3 src/34_export_paper_support_materials.py
   ```
 - [x] 检查 `outputs/tables/*.tex` 是否满足三线表要求（`booktabs` 结构已存在）。
-- [x] 检查 `outputs/figures/*.pdf` 是否可正常识别为 PDF（当前合同图件 Figure 1—9 均生成 PDF/PNG/JPG）。
-- [x] 当前图件导出链路同时生成 PNG/JPG，便于 Word/WPS 插图；新增 Table 14/15 与 Figure 7/8/9 作为论文支撑素材。
+- [x] 检查 `outputs/figures/*.pdf` 是否可正常识别为 PDF（当前合同图件 Figure 1—10 均生成 PDF/PNG/JPG）。
+- [x] 当前图件导出链路同时生成 PNG/JPG，便于 Word/WPS 插图；新增 Table 14/15 与 Figure 7/8/9/10 作为论文支撑素材。
 - [x] 当前提交包脚本会复制 ignored `outputs/tables/` 与 `outputs/figures/` 生成物到本地 `dist/submission_package_current/`，无需 force-add 到 Git。
 
 ## 4. 数据与代码包任务
@@ -58,8 +60,8 @@
 - [x] 使用 `python3 src/32_prepare_submission_package.py` 生成本地提交包；默认不复制 `data/raw/`。
 - [x] 本地提交包自动包含 `paper/final-editing-guide.md`、`paper/05_materials_and_adversarial_review.md` 和 `paper/04_submission_manuscript_candidate.docx`，DOCX 文末附带当前表格附录与图件清单。
 - [ ] 若确认派生数据可提交，再使用 `python3 src/32_prepare_submission_package.py --include-derived-data` 生成含派生数据版本。
-- [x] 运行完整测试：`python3 -m pytest -q`（2026-05-03，95 passed）。
-- [x] 运行语法检查：`python3 -m py_compile $(find src tests -name '*.py' | sort)`（2026-05-03，exit 0）。
+- [x] 运行完整测试：`python3 -m pytest -q`（2026-05-04，95 passed）。
+- [x] 运行语法检查：`python3 -m py_compile $(find src tests -name '*.py' | sort)`（2026-05-04，exit 0）。
 - [x] 确认 `README.md` 中运行顺序与当前脚本一致（已包含 `src/34_export_paper_support_materials.py`）。
 - [ ] 导出环境说明：`environment.yml` 或 `requirements` 与实际运行环境一致。
 

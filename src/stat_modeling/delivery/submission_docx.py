@@ -99,6 +99,17 @@ FALLBACK_FIGURE_SPECS = (
         "status": "support_material",
         "caveat": "Descriptive regional trend only; not causal evidence.",
     },
+    {
+        "figure_id": "Figure 10",
+        "filename": "figure_10_research_framework.pdf",
+        "png_filename": "figure_10_research_framework.png",
+        "jpg_filename": "figure_10_research_framework.jpg",
+        "caption_cn": "研究框架与技术路线图",
+        "caption_en": "Research framework and technical route",
+        "source": "docs/paper/04_submission_manuscript_candidate.md",
+        "status": "support_material",
+        "caveat": "Design-only route map; it summarizes the approved evidence chain and does not add a new empirical result.",
+    },
 )
 
 

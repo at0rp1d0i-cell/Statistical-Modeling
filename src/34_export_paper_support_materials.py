@@ -344,6 +344,111 @@ def export_regional_trend_figure(dml_input: pd.DataFrame, cate_groups: pd.DataFr
     return save_figure(fig, output_dir / "figure_09_regional_descriptive_trends.pdf")
 
 
+def export_research_framework_figure(output_dir: Path) -> dict[str, Path]:
+    """Export a paper-facing technical-route figure.
+
+    The figure is deliberately design-only: it summarizes the already approved
+    empirical pipeline and does not introduce new variables, estimators, or
+    robustness checks. Labels are in English so the asset renders reliably even
+    on machines without Chinese fonts.
+    """
+
+    steps = [
+        {
+            "title": "Data integration",
+            "body": "PKU DFIIC + CMCC carbon\n+ core city controls\n2019-2023 city panel",
+            "color": "#d9eaf7",
+        },
+        {
+            "title": "Main identification",
+            "body": "Partial-linear DML\nGroup cross-fitting\nCity-clustered SE",
+            "color": "#e2f0d9",
+        },
+        {
+            "title": "Robustness",
+            "body": "Outcome replacement\nTWFE benchmark\nPlacebo + learner checks\nPopulation sensitivity",
+            "color": "#fff2cc",
+        },
+        {
+            "title": "Heterogeneity",
+            "body": "Causal forest CATE\nRegion / development\n/ industry groups\nBootstrap diagnostics",
+            "color": "#fde9d9",
+        },
+        {
+            "title": "Policy text module",
+            "body": "Document registry\nRule proxy scoring\nLLM readiness gate\nMethod appendix until validated",
+            "color": "#eadcf8",
+        },
+    ]
+
+    fig, ax = plt.subplots(figsize=(12.5, 4.8))
+    ax.set_axis_off()
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.text(
+        0.5,
+        0.95,
+        "Research framework: digital inclusive finance and urban carbon reduction",
+        ha="center",
+        va="center",
+        fontsize=14,
+        fontweight="bold",
+    )
+    ax.text(
+        0.5,
+        0.885,
+        "Evidence chain aligned with the approved main specification; policy-text scoring remains a readiness-gated module.",
+        ha="center",
+        va="center",
+        fontsize=9.5,
+        color="#555555",
+    )
+
+    box_width = 0.17
+    box_height = 0.46
+    y0 = 0.32
+    xs = [0.035, 0.235, 0.435, 0.635, 0.815]
+    for idx, (x0, step) in enumerate(zip(xs, steps, strict=True), start=1):
+        patch = plt.Rectangle((x0, y0), box_width, box_height, facecolor=step["color"], edgecolor="#555555", linewidth=1.2)
+        ax.add_patch(patch)
+        ax.text(
+            x0 + box_width / 2,
+            y0 + box_height - 0.065,
+            f"{idx}. {step['title']}",
+            ha="center",
+            va="center",
+            fontsize=10,
+            fontweight="bold",
+        )
+        ax.text(
+            x0 + box_width / 2,
+            y0 + box_height / 2 - 0.02,
+            step["body"],
+            ha="center",
+            va="center",
+            fontsize=8.5,
+            linespacing=1.35,
+        )
+        if idx < len(steps):
+            ax.annotate(
+                "",
+                xy=(x0 + box_width + 0.025, y0 + box_height / 2),
+                xytext=(x0 + box_width + 0.005, y0 + box_height / 2),
+                arrowprops=dict(arrowstyle="->", linewidth=1.3, color="#555555"),
+            )
+
+    ax.text(
+        0.5,
+        0.16,
+        "Reporting boundary: DML evidence is conditional on observed controls; population sensitivity and LLM not-ready status must remain disclosed.",
+        ha="center",
+        va="center",
+        fontsize=9,
+        color="#7f1d1d",
+    )
+    return save_figure(fig, output_dir / "figure_10_research_framework.pdf")
+
+
 def export_support_materials(
     modeling_panel_path: Path,
     dml_input_path: Path,
@@ -395,6 +500,7 @@ def export_support_materials(
     robustness = build_robustness_rows(table_02, table_06, table_08, table_11)
     outputs.update({f"forest_{key}": value for key, value in export_robustness_forest_figure(robustness, figures_dir).items()})
     outputs.update({f"regional_{key}": value for key, value in export_regional_trend_figure(dml_input, cate_groups, figures_dir).items()})
+    outputs.update({f"framework_{key}": value for key, value in export_research_framework_figure(figures_dir).items()})
     return outputs
 
 

@@ -31,6 +31,7 @@
 | Figure 7 | `outputs/figures/figure_07_sample_coverage_by_year.pdf/png/jpg` | 展示 DML 样本逐年覆盖 | 数据章节可放正文，增强样本可信度 |
 | Figure 8 | `outputs/figures/figure_08_robustness_evidence_forest.pdf/png/jpg` | 汇总强度口径稳健性估计区间 | 建议放正文稳健性章节，帮助评委快速看证据方向 |
 | Figure 9 | `outputs/figures/figure_09_regional_descriptive_trends.pdf/png/jpg` | 展示区域描述性趋势 | 可放异质性章节前或附录；不是因果证据 |
+| Figure 10 | `outputs/figures/figure_10_research_framework.pdf/png/jpg` | 展示研究框架与技术路线 | 建议放引言末尾或方法章节开头；不是新增实证结果 |
 
 生成命令：
 
@@ -57,3 +58,7 @@ python3 src/34_export_paper_support_materials.py
 3. **分组 DML 再估计：** 对低/高经济发展水平、区域分组分别估计 DML，而不仅是 CATE 分组摘要。
 4. **机制变量先验弱化版本：** 若政策文本仍 not_ready，可只做规则代理的附录演示，不进入主结论。
 5. **地图类图件：** 若获得稳定地级市边界数据，可加入空间分布图；否则不建议临时引入地图，避免坐标匹配和审美风险。
+
+## 往届优秀论文格式借鉴
+
+已新增 `docs/paper/06_prior_winner_style_review.md`。第十届获奖文选显示，获奖论文常通过技术路线图、模型对比/消融实验和边界清晰的政策建议增强说服力。本轮新增 Figure 10 先补齐“研究框架图”缺口；控制集规格递进、分项指数替换或滞后处理变量等进一步增强项需用户确认后再实施。

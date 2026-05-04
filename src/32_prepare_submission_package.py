@@ -93,6 +93,9 @@ FIGURE_FILES = (
     "figure_09_regional_descriptive_trends.pdf",
     "figure_09_regional_descriptive_trends.png",
     "figure_09_regional_descriptive_trends.jpg",
+    "figure_10_research_framework.pdf",
+    "figure_10_research_framework.png",
+    "figure_10_research_framework.jpg",
     "figure_manifest.csv",
 )
 
