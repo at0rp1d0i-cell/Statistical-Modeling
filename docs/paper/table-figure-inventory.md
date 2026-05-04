@@ -50,6 +50,7 @@
 | Figure manifest | `outputs/figures/figure_manifest.csv` | `src/25_export_result_figures.py` | 已生成 | 记录 Figure 1—4 caption、来源与 caveat；Figure 5—10 由 DOCX fallback 规则补入图件清单 |
 
 > 图件格式说明：`src/25_export_result_figures.py`、`src/06_robustness.py`、`src/27_export_heterogeneity_groups.py` 和 `src/34_export_paper_support_materials.py` 当前均会为论文图件同时输出 `.pdf`、`.png` 和 `.jpg`。论文正式排版优先使用 PDF 或 PNG；JPG 主要用于兼容只接受位图的场景。
+> 协作说明：为便于 GitHub 预览和论文协作，当前 Figure 1—10 的 PNG 版已同步保存到 `docs/paper/figures/` 并纳入版本管理；`outputs/figures/` 仍作为可再生成输出目录保持忽略。
 
 ## 正文与附录放置建议
 
