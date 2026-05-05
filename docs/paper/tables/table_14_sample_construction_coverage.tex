@@ -1,0 +1,15 @@
+\begin{table}
+\caption{样本构造与覆盖情况}
+\label{tab:sample_construction_coverage}
+\begin{tabular}{rlrrlrrl}
+\toprule
+stage_order & stage_cn & city_year_obs & cities & year_range & retention_vs_stage_1 & retention_vs_previous & note \\
+\midrule
+1 & PKU-CMCC 候选匹配面板 & 1677 & 338 & 2019-2023 & 1.000000 & 1.000000 & 数字普惠金融与碳排放候选合并后的城市—年份面板。 \\
+2 & 具备 CMCC 碳排放结果变量 & 1664 & 335 & 2019-2023 & 0.992200 & 0.992200 & 保留具有城市碳排放总量的观测。 \\
+3 & 同时具备核心控制变量 & 1456 & 294 & 2019-2023 & 0.868200 & 0.875000 & 在具备结果变量基础上保留 GDP、第二产业占比和财政支出可用观测。 \\
+4 & DML 候选就绪样本 & 1456 & 294 & 2019-2023 & 0.868200 & 1.000000 & 同时满足结果变量、处理变量和核心控制变量可用。 \\
+5 & 最终 DML 输入样本 & 1456 & 294 & 2019-2023 & 0.868200 & 1.000000 & 进入当前主回归、稳健性和异质性分析的样本。 \\
+\bottomrule
+\end{tabular}
+\end{table}

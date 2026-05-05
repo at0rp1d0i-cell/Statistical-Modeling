@@ -1,0 +1,2 @@
+validation_scope,total_registered_docs,score_rows,completed_score_rows,range_valid_score_rows,human_validated_rows,validation_ready_rows,missing_registered_docs,duplicate_doc_rows,mean_abs_rule_llm_delta,readiness_status,status_note
+policy_llm_scoring,3,3,0,0,0,0,0,0,,not_ready,LLM评分或人工复核尚未完成；当前只能作为评分准备/校验框架，不能作为正式机制证据。

@@ -1,0 +1,12 @@
+\begin{table}
+\caption{人口变量敏感性稳健性检验（DML，人口变量不进入主规格）}
+\label{tab:population_sensitivity_robustness}
+\begin{tabular}{llllllll}
+\toprule
+规格 & ATE & 标准误 & 95%CI下限 & 95%CI上限 & P值 & 相对主规格变化 & 样本量 \\
+\midrule
+主规格：不含人口变量 & -0.0541 & 0.0210 & -0.0952 & -0.0130 & 0.0098 & 0.0000 & 1456 \\
+敏感性：加入人口变量 & -0.0180 & 0.0221 & -0.0613 & 0.0254 & 0.4172 & 0.0361 & 1456 \\
+\bottomrule
+\end{tabular}
+\end{table}

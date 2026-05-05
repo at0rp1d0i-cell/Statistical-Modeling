@@ -1,0 +1,2 @@
+样本量,CATE均值,CATE标准差,CATE 25%分位,CATE中位数,CATE 75%分位,候选特征集
+1456,-0.0516,0.0648,-0.0699,-0.0323,-0.0196,"gdp_total, secondary_industry_share, fiscal_expenditure"

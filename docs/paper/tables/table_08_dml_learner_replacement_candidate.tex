@@ -1,0 +1,13 @@
+\begin{table}
+\caption{DML 学习器替换候选稳健性检验}
+\label{tab:dml_learner_replacement_candidate}
+\begin{tabular}{lllllll}
+\toprule
+学习器 & ATE & 标准误 & 95%CI下限 & 95%CI上限 & P值 & 样本量 \\
+\midrule
+GradientBoosting baseline & -0.0541 & 0.0210 & -0.0952 & -0.0130 & 0.0098 & 1456 \\
+RandomForest replacement & -0.0383 & 0.0193 & -0.0761 & -0.0005 & 0.0472 & 1456 \\
+ExtraTrees replacement & -0.0393 & 0.0195 & -0.0775 & -0.0012 & 0.0432 & 1456 \\
+\bottomrule
+\end{tabular}
+\end{table}
